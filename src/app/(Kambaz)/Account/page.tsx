@@ -1,14 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-export default function AccountPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/Account/Signin");
-  }, [router]);
-
-  return <div>Redirecting to Signin...</div>;
+export default function AccountIndex() {
+  redirect("/account/signin");
 }
