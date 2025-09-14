@@ -3,11 +3,21 @@ import AccountNavigation from "./Navigation";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div id="wd-kambaz" style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: 200, borderRight: "1px solid #ccc", padding: 16 }}>
-        <AccountNavigation />
-      </aside>
-      <main style={{ flex: 1, padding: 24 }}>{children}</main>
+    <div id="wd-kambaz">
+      <table role="presentation">
+        <tbody>
+          <tr>
+            <td>
+              <aside aria-label="Account navigation">
+                <AccountNavigation />
+              </aside>
+            </td>
+            <td>
+              <main>{children}</main>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
