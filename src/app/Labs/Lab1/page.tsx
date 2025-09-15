@@ -277,7 +277,7 @@ export default function Lab1() {
       <a href="https://www.lipsum.com" id="wd-lipsum"> click here </a>
       to get dummy text<br />
       Check out my code repository on GitHub:
-      <a href="https://github.com/aarushiattray/xxx" id="wd-github"> My GitHub Repo</a>
+      <a href="https://github.com/aarushiattray/kambaz-next-js" id="wd-github"> My GitHub Repo</a>
     </>
   );
 }

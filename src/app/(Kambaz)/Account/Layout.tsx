@@ -1,16 +1,20 @@
 import { ReactNode } from "react";
 import AccountNavigation from "./Navigation";
-
-export default function AccountLayout({ children }: { children: ReactNode }) {
-  return (
-    <div id="wd-kambaz" style={{ display: "flex", minHeight: "100vh" }}>
-      <div style={{ width: "200px", borderRight: "1px solid #ccc" }}>
-        <AccountNavigation />
-      </div>
-      <div style={{ flex: 1, padding: "20px" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
+export default function AccountLayout({ children }: Readonly<{ children: ReactNode }>) {
+ return (
+   <div id="wd-kambaz">
+     <table>
+       <tbody>
+         <tr>
+           <td valign="top">
+             <AccountNavigation />
+           </td>
+           <td valign="top" width="100%">
+             {children}
+           </td>
+         </tr>
+       </tbody>
+     </table>
+  </div>
+);}
 
