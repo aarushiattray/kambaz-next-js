@@ -6,8 +6,10 @@ export default function AccountLayout({
   params,
 }: {
   children: ReactNode;
-  params: {}; // no actual params, but keep the signature like CoursesLayout
+  params: { cid: string }; 
 }) {
+  const { cid } = params; 
+
   return (
     <div id="wd-kambaz">
       <table>

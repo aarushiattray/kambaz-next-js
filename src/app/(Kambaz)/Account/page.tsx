@@ -1,11 +1,8 @@
 import { redirect } from "next/navigation";
 
-export default async function AccountPage({
-  params,
-}: {
-  params: {}; // mimic CoursesPage signature
-}) {
-  redirect("/Account/Signin"); // redirect to Signin page
+export default async function AccountPage({ params, }: { params: Promise<{ cid: string }>; }) {
+ const { cid } = await params;
+ redirect("/Account/Signin");
 }
 
 
