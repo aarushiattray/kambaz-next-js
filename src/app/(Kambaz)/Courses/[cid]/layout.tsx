@@ -6,9 +6,9 @@ export default function CoursesLayout({
   params,
 }: {
   children: ReactNode;
-  params: { cid: string }; // must match route param name exactly
+  params: { cid: string }; 
 }) {
-  const { cid } = params; // extract the route param
+  const { cid } = params; 
 
   return (
     <div id="wd-courses">
