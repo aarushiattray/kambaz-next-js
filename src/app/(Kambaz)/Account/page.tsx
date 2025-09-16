@@ -10,8 +10,5 @@ export default function AccountPage() {
     router.replace("/Account/Signin");
   }, [router]);
 
-  return null; // nothing rendered, but layout (sidebar) still loads
+  return <div>Loading...</div>; // Layout + sidebar still render
 }
-
-
-
