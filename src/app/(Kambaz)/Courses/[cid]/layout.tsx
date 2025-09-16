@@ -3,12 +3,11 @@ import CourseNavigation from "./Navigation";
 
 type CoursesLayoutProps = {
   children: ReactNode;
-  params: { cid: string }; // <-- match your route param
+  params: { cid: string }; // must match route param
 };
 
 export default function CoursesLayout({ children, params }: CoursesLayoutProps) {
-  const { cid } = params; // <-- use 'cid' from the route
-
+  const { cid } = params; // extract cid directly
   return (
     <div id="wd-courses">
       <h2>Courses {cid}</h2>
@@ -24,4 +23,3 @@ export default function CoursesLayout({ children, params }: CoursesLayoutProps) 
     </div>
   );
 }
-
