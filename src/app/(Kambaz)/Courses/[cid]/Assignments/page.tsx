@@ -53,6 +53,18 @@ export default function Assignments() {
           <br />
           <b>Due</b> May 27 at 11:59pm | 100 pts
         </li>
+
+        <li className="wd-assignment-list-item">
+          Quizzes
+        </li>
+
+        <li className="wd-assignment-list-item">
+          Exams
+        </li>
+
+        <li className="wd-assignment-list-item">
+          Projects
+        </li>
       </ul>
     </div>
   );

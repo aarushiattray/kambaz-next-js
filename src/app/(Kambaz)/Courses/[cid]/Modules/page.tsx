@@ -1,6 +1,7 @@
 export default function Modules() {
   return (
     <div>
+      <h2>Modules</h2>
       <div className="wd-controls" style={{ marginBottom: "16px" }}>
         <button>Collapse All</button>
         <button>View Progress</button>
