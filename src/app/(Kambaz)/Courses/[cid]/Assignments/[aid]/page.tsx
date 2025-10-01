@@ -2,156 +2,177 @@
 
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue="A1 - ENV + HTML" /><br /><br />
+    <div className="px-4 py-4" style={{ maxWidth: '800px', marginLeft: 0, textAlign: 'left' }}>
 
-      <textarea
-        id="wd-description"
-        rows={7}
-        defaultValue={`The assignment is available online Submit a link to the landing page of your Web
-application running on Netlify. The landing page should include the following: Your full
-name and section Links to each of the lab assignments Link to the Kanbas application
-Links to all relevant source code repositories The Kanbas application should include a link
-to navigate back to the landing page.`}
-      />
-      <br />
+      {/* Assignment Name */}
+      <div className="mb-3">
+        <label htmlFor="wd-name" className="form-label fw-bold">Assignment Name</label>
+        <input id="wd-name" defaultValue="A1 - ENV + HTML" className="form-control" />
+      </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <tbody>
-   
-          <tr>
-            <td style={{ width: "40%", textAlign: "right", verticalAlign: "top", padding: "8px 12px" }}>
-              <label htmlFor="wd-points">Points</label>
-            </td>
-            <td style={{ width: "60%", padding: "8px 12px" }}>
-              <input id="wd-points" defaultValue={100} style={{ width: "120px" }} />
-            </td>
-          </tr>
+      {/* Description */}
+      <div className="mb-3">
+        <label className="form-label fw-bold">Description</label>
+        <div
+          id="wd-description"
+          className="form-control"
+          contentEditable
+          style={{ minHeight: '150px', whiteSpace: 'pre-wrap' }}
+        >
+          The assignment is <span className="text-danger">available online</span>
+          <br /><br />
+          Submit a link to the landing page of your Web application running on Netlify.
+          <br /><br />
+          The landing page should include the following:
+          <br />
+          • Your full name and section
+          <br />
+          • Links to each of the lab assignments
+          <br />
+          • Link to the Kanbas application
+          <br />
+          • Links to all relevant source code repositories
+          <br /><br />
+          The Kanbas application should include a link to navigate back to the landing page.
+        </div>
+      </div>
 
-          <tr><td colSpan={2} style={{ height: 12 }} /></tr>
+      {/* Points */}
+      <div className="row mb-3 align-items-center">
+        <label htmlFor="wd-points" className="col-sm-3 col-form-label fw-bold">Points</label>
+        <div className="col-sm-9">
+          <input id="wd-points" type="number" defaultValue={100} className="form-control" />
+        </div>
+      </div>
 
-     
-          <tr>
-            <td style={{ textAlign: "right", verticalAlign: "top", padding: "8px 12px" }}>
-              <label htmlFor="wd-group">Assignment Group</label>
-            </td>
-            <td style={{ padding: "8px 12px" }}>
-              <select id="wd-group" defaultValue="ASSIGNMENTS" style={{ width: "200px" }}>
-                <option>ASSIGNMENTS</option>
-              </select>
-            </td>
-          </tr>
+      {/* Assignment Group */}
+      <div className="row mb-3 align-items-center">
+        <label htmlFor="wd-group" className="col-sm-3 col-form-label fw-bold">Assignment Group</label>
+        <div className="col-sm-9">
+          <select id="wd-group" defaultValue="ASSIGNMENTS" className="form-select">
+            <option>ASSIGNMENTS</option>
+          </select>
+        </div>
+      </div>
 
-          
-          <tr>
-            <td style={{ textAlign: "right", verticalAlign: "top", padding: "8px 12px" }}>
-              <label htmlFor="wd-display-grade-as">Display Grade as</label>
-            </td>
-            <td style={{ padding: "8px 12px" }}>
-              <select id="wd-display-grade-as" defaultValue="Percentage" style={{ width: "200px" }}>
-                <option>Percentage</option>
-              </select>
-            </td>
-          </tr>
+      {/* Display Grade As */}
+      <div className="row mb-3 align-items-center">
+        <label htmlFor="wd-display-grade-as" className="col-sm-3 col-form-label fw-bold">Display Grade as</label>
+        <div className="col-sm-9">
+          <select id="wd-display-grade-as" defaultValue="Percentage" className="form-select">
+            <option>Percentage</option>
+          </select>
+        </div>
+      </div>
 
-          
-          <tr>
-            <td style={{ textAlign: "right", verticalAlign: "top", padding: "8px 12px" }}>
-              <label htmlFor="wd-submission-type">Submission Type</label>
-            </td>
-            <td style={{ padding: "8px 12px" }}>
-              <select id="wd-submission-type" defaultValue="Online" style={{ width: "200px" }}>
+      {/* Submission Type Section */}
+      <div className="row mb-3 align-items-start">
+        <label className="col-sm-3 col-form-label fw-bold">Submission Type</label>
+        <div className="col-sm-9">
+
+          {/* Submission Type Box */}
+          <div className="border p-3 rounded">
+
+            {/* Online Select */}
+            <div className="mb-3">
+              <select id="wd-submission-type" defaultValue="Online" className="form-select">
                 <option>Online</option>
               </select>
+            </div>
 
-              <div style={{ height: 10 }} />
+            {/* Online Entry Options */}
+            <div className="fw-bold mb-2">Online Entry Options</div>
+            <div className="form-check mb-1">
+              <input type="checkbox" id="wd-text-entry" className="form-check-input" />
+              <label htmlFor="wd-text-entry" className="form-check-label">Text Entry</label>
+            </div>
+            <div className="form-check mb-1">
+              <input type="checkbox" id="wd-website-url" className="form-check-input" defaultChecked />
+              <label htmlFor="wd-website-url" className="form-check-label">Website URL</label>
+            </div>
+            <div className="form-check mb-1">
+              <input type="checkbox" id="wd-media-recordings" className="form-check-input" />
+              <label htmlFor="wd-media-recordings" className="form-check-label">Media Recordings</label>
+            </div>
+            <div className="form-check mb-1">
+              <input type="checkbox" id="wd-student-annotation" className="form-check-input" />
+              <label htmlFor="wd-student-annotation" className="form-check-label">Student Annotation</label>
+            </div>
+            <div className="form-check mb-1">
+              <input type="checkbox" id="wd-file-upload" className="form-check-input" />
+              <label htmlFor="wd-file-upload" className="form-check-label">File Uploads</label>
+            </div>
 
-              <div style={{ display: "inline-block", textAlign: "left" }}>
-                <div style={{ marginBottom: 6 }}>Online Entry Options</div>
+          </div>
+        </div>
+      </div>
 
-                <div style={{ marginBottom: 6 }}>
-                  <input type="checkbox" id="wd-text-entry" />
-                  <label htmlFor="wd-text-entry" style={{ marginLeft: 8 }}>Text Entry</label>
-                </div>
+      {/* Assign Section */}
+      <div className="row mb-3 align-items-start">
+        <label className="col-sm-3 col-form-label fw-bold">Assign</label>
+        <div className="col-sm-9">
 
-                <div style={{ marginBottom: 6 }}>
-                  <input type="checkbox" id="wd-website-url" />
-                  <label htmlFor="wd-website-url" style={{ marginLeft: 8 }}>Website URL</label>
-                </div>
+          {/* Assign Box */}
+          <div className="border p-3 rounded">
 
-                <div style={{ marginBottom: 6 }}>
-                  <input type="checkbox" id="wd-media-recordings" />
-                  <label htmlFor="wd-media-recordings" style={{ marginLeft: 8 }}>Media Recordings</label>
-                </div>
-
-                <div style={{ marginBottom: 6 }}>
-                  <input type="checkbox" id="wd-student-annotation" />
-                  <label htmlFor="wd-student-annotation" style={{ marginLeft: 8 }}>Student Annotation</label>
-                </div>
-
-                <div style={{ marginBottom: 6 }}>
-                  <input type="checkbox" id="wd-file-upload" />
-                  <label htmlFor="wd-file-upload" style={{ marginLeft: 8 }}>File Uploads</label>
-                </div>
+            {/* Assign To */}
+            <div className="mb-3">
+              <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label>
+              <div className="form-control d-flex align-items-center flex-wrap" style={{ minHeight: '40px' }}>
+                <span className="badge bg-secondary text-dark d-flex align-items-center me-1 mb-1">
+                  Everyone
+                  <button
+                    type="button"
+                    className="btn-close btn-close-black btn-sm ms-1"
+                    aria-label="Remove"
+                  ></button>
+                </span>
               </div>
-            </td>
-          </tr>
+            </div>
 
-          <tr><td colSpan={2} style={{ height: 12 }} /></tr>
+            {/* Due Date */}
+            <div className="mb-3">
+              <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label>
+              <input
+                type="datetime-local"
+                id="wd-due-date"
+                defaultValue="2024-05-13T23:59"
+                className="form-control"
+              />
+            </div>
 
-         
-          <tr>
-            <td style={{ width: "40%" }}></td>
-            <td style={{ width: "60%", padding: "8px 12px" }}>
-              <label htmlFor="wd-assign-to">Assign to</label><br />
-              <input id="wd-assign-to" defaultValue="Everyone" style={{ width: "200px" }} />
-            </td>
-          </tr>
-
-          
-          <tr>
-            <td style={{ width: "40%" }}></td>
-            <td style={{ width: "60%", padding: "8px 12px" }}>
-              <label htmlFor="wd-due-date">Due</label><br />
-              <input type="date" id="wd-due-date" defaultValue="2024-05-13" style={{ width: "200px" }} />
-            </td>
-          </tr>
-
-          
-          <tr>
-            <td style={{ width: "40%" }}></td>
-            <td style={{ width: "60%", padding: "8px 12px", display: "flex", gap: "24px" }}>
-              <div style={{ flex: 1 }}>
-                <label htmlFor="wd-available-from">Available from</label><br />
-                <input type="date" id="wd-available-from" defaultValue="2024-05-06" style={{ width: "120px" }} />
+            {/* Available From / Until */}
+            <div className="row g-3">
+              <div className="col">
+                <label htmlFor="wd-available-from" className="form-label fw-bold">Available from</label>
+                <input
+                  type="datetime-local"
+                  id="wd-available-from"
+                  defaultValue="2024-05-06T00:00"
+                  className="form-control"
+                />
               </div>
-              <div style={{ flex: 1 }}>
-                <label htmlFor="wd-available-until">Until</label><br />
-                <input type="date" id="wd-available-until" defaultValue="2024-05-20" style={{ width: "120px" }} />
+              <div className="col">
+                <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label>
+                <input
+                  type="datetime-local"
+                  id="wd-available-until"
+                  defaultValue="2024-05-20T23:59"
+                  className="form-control"
+                />
               </div>
-            </td>
-          </tr>
+            </div>
 
-          <tr><td colSpan={2} style={{ height: 18 }} /></tr>
-          <tr><td colSpan={2}><hr /></td></tr>
+          </div>
+        </div>
+      </div>
 
-         
-          <tr>
-            <td colSpan={2} style={{ textAlign: "right", padding: "8px 12px" }}>
-              <button type="button" style={{ marginRight: 8 }}>Cancel</button>
-              <button type="button">Save</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      {/* Buttons */}
+      <div className="d-flex justify-content-start gap-2 mt-3">
+        <button type="button" className="btn btn-secondary">Cancel</button>
+        <button type="button" className="btn btn-danger">Save</button>
+      </div>
 
-      <style jsx>{`
-        #wd-assignments-editor { font-family: serif; padding: 10px 12px; max-width: 720px; }
-        #wd-assignments-editor label[for="wd-name"] { display: block; font-weight: 700; font-size: 1.15rem; margin-bottom: 6px; }
-        #wd-assignments-editor textarea { width: 100%; max-width: 680px; white-space: pre-wrap; }
-        #wd-assignments-editor input, #wd-assignments-editor select, #wd-assignments-editor textarea { font-family: inherit; font-size: 0.95rem; }
-      `}</style>
     </div>
   );
 }
