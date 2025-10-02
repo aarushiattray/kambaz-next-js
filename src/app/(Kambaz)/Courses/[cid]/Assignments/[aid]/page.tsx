@@ -17,6 +17,7 @@ export default function AssignmentEditor() {
           id="wd-description"
           className="form-control"
           contentEditable
+          suppressContentEditableWarning
           style={{ minHeight: '150px', whiteSpace: 'pre-wrap' }}
         >
           The assignment is <span className="text-danger">available online</span>
@@ -167,8 +168,11 @@ export default function AssignmentEditor() {
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="d-flex justify-content-start gap-2 mt-3">
+      {/* Black line above buttons */}
+      <hr className="border-dark mt-4" />
+
+      {/* Bottom-right buttons */}
+      <div className="d-flex justify-content-end gap-2">
         <button type="button" className="btn btn-secondary">Cancel</button>
         <button type="button" className="btn btn-danger">Save</button>
       </div>
