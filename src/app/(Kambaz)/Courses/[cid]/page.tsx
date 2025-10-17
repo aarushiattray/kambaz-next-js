@@ -5,3 +5,5 @@ export default async function CoursesPage({ params, }: { params: Promise<{ cid: 
  redirect(`/Courses/${cid}/Home`);
 }
 
+
+

@@ -1,13 +1,68 @@
 "use client";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import assignments from "../../../../Database/assignments.json";
+import courses from "../../../../Database/courses.json";
+
+// Defining types because was getting build errors otherwsie and was not deploying to Vercel
+interface Assignment {
+  _id: string;
+  course: string;
+  title: string;
+  description: string;
+  points: number;
+  availableDate: string;
+  dueDate: string;
+}
+
+interface Course {
+  _id: string;
+  name: string;
+}
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams();
+
+  const assignment = (assignments as Assignment[]).find(
+    (a) => a._id === aid && a.course === cid
+  );
+  const course = (courses as Course[]).find((c) => c._id === cid);
+
+  if (!assignment || !course) {
+    return <div className="p-4">Assignment not found.</div>;
+  }
+
+  // Map month name to number
+  const monthMap: { [key: string]: string } = {
+    January: "01", February: "02", March: "03", April: "04", May: "05", June: "06",
+    July: "07", August: "08", September: "09", October: "10", November: "11", December: "12"
+  };
+
+  // Convert "May 6" -> "YYYY-MM-DDTHH:mm"
+  const parseDate = (dateStr: string | undefined, endOfDay = false): string => {
+    if (!dateStr) return "";
+    const parts = dateStr.split(" ");
+    if (parts.length !== 2) return "";
+    const [monthName, dayStr] = parts;
+    const month = monthMap[monthName];
+    if (!month) return "";
+    const day = dayStr.padStart(2, "0");
+    const year = new Date().getFullYear();
+    const hours = endOfDay ? "23" : "00";
+    const minutes = endOfDay ? "59" : "00";
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const availableFrom = parseDate(assignment.availableDate);
+  const dueDate = parseDate(assignment.dueDate, true);
+  const availableUntil = dueDate;
+
   return (
     <div className="px-4 py-4" style={{ maxWidth: '800px', marginLeft: 0, textAlign: 'left' }}>
-
       {/* Assignment Name */}
       <div className="mb-3">
         <label htmlFor="wd-name" className="form-label fw-bold">Assignment Name</label>
-        <input id="wd-name" defaultValue="A1 - ENV + HTML" className="form-control" />
+        <input id="wd-name" defaultValue={assignment.title} className="form-control" />
       </div>
 
       {/* Description */}
@@ -20,21 +75,7 @@ export default function AssignmentEditor() {
           suppressContentEditableWarning
           style={{ minHeight: '150px', whiteSpace: 'pre-wrap' }}
         >
-          The assignment is <span className="text-danger">available online</span>
-          <br /><br />
-          Submit a link to the landing page of your Web application running on Netlify.
-          <br /><br />
-          The landing page should include the following:
-          <br />
-          • Your full name and section
-          <br />
-          • Links to each of the lab assignments
-          <br />
-          • Link to the Kanbas application
-          <br />
-          • Links to all relevant source code repositories
-          <br /><br />
-          The Kanbas application should include a link to navigate back to the landing page.
+          {assignment.description}
         </div>
       </div>
 
@@ -42,7 +83,7 @@ export default function AssignmentEditor() {
       <div className="row mb-3 align-items-center">
         <label htmlFor="wd-points" className="col-sm-3 col-form-label fw-bold">Points</label>
         <div className="col-sm-9">
-          <input id="wd-points" type="number" defaultValue={100} className="form-control" />
+          <input id="wd-points" type="number" defaultValue={assignment.points} className="form-control" />
         </div>
       </div>
 
@@ -70,18 +111,12 @@ export default function AssignmentEditor() {
       <div className="row mb-3 align-items-start">
         <label className="col-sm-3 col-form-label fw-bold">Submission Type</label>
         <div className="col-sm-9">
-
-          {/* Submission Type Box */}
           <div className="border p-3 rounded">
-
-            {/* Online Select */}
             <div className="mb-3">
               <select id="wd-submission-type" defaultValue="Online" className="form-select">
                 <option>Online</option>
               </select>
             </div>
-
-            {/* Online Entry Options */}
             <div className="fw-bold mb-2">Online Entry Options</div>
             <div className="form-check mb-1">
               <input type="checkbox" id="wd-text-entry" className="form-check-input" />
@@ -103,7 +138,6 @@ export default function AssignmentEditor() {
               <input type="checkbox" id="wd-file-upload" className="form-check-input" />
               <label htmlFor="wd-file-upload" className="form-check-label">File Uploads</label>
             </div>
-
           </div>
         </div>
       </div>
@@ -112,11 +146,7 @@ export default function AssignmentEditor() {
       <div className="row mb-3 align-items-start">
         <label className="col-sm-3 col-form-label fw-bold">Assign</label>
         <div className="col-sm-9">
-
-          {/* Assign Box */}
           <div className="border p-3 rounded">
-
-            {/* Assign To */}
             <div className="mb-3">
               <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label>
               <div className="form-control d-flex align-items-center flex-wrap" style={{ minHeight: '40px' }}>
@@ -137,7 +167,7 @@ export default function AssignmentEditor() {
               <input
                 type="datetime-local"
                 id="wd-due-date"
-                defaultValue="2024-05-13T23:59"
+                defaultValue={dueDate}
                 className="form-control"
               />
             </div>
@@ -149,7 +179,7 @@ export default function AssignmentEditor() {
                 <input
                   type="datetime-local"
                   id="wd-available-from"
-                  defaultValue="2024-05-06T00:00"
+                  defaultValue={availableFrom}
                   className="form-control"
                 />
               </div>
@@ -158,12 +188,11 @@ export default function AssignmentEditor() {
                 <input
                   type="datetime-local"
                   id="wd-available-until"
-                  defaultValue="2024-05-20T23:59"
+                  defaultValue={availableUntil}
                   className="form-control"
                 />
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -173,10 +202,9 @@ export default function AssignmentEditor() {
 
       {/* Bottom-right buttons */}
       <div className="d-flex justify-content-end gap-2">
-        <button type="button" className="btn btn-secondary">Cancel</button>
-        <button type="button" className="btn btn-danger">Save</button>
+        <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary">Cancel</Link>
+        <Link href={`/Courses/${cid}/Assignments`} className="btn btn-danger">Save</Link>
       </div>
-
     </div>
   );
 }

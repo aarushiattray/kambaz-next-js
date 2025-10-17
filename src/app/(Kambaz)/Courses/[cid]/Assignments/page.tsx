@@ -1,15 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { ListGroup, ListGroupItem, Button, FormControl } from "react-bootstrap";
 import { BsGripVertical, BsPlus } from "react-icons/bs";
 import { FaSearch, FaCheckCircle, FaCircle, FaCaretDown } from "react-icons/fa";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { MdOutlineAssignment } from "react-icons/md";
+import assignmentsData from "../../../Database/assignments.json";
 import "../../../styles.css";
 
 // Inline GreenCheckmark component
 function GreenCheckmark() {
   return (
-    <span className="position-relative d-inline-block me-2" style={{ width: "20px", height: "20px" }}>
+    <span
+      className="position-relative d-inline-block me-2"
+      style={{ width: "20px", height: "20px" }}
+    >
       <FaCircle className="text-white fs-6 position-absolute top-0 start-0" />
       <FaCheckCircle className="text-success fs-5 position-absolute top-0 start-0" />
     </span>
@@ -50,34 +57,41 @@ function LessonControlButtons() {
 }
 
 export default function Assignments() {
-  const assignments = [
-    { id: 123, title: "A1 - ENV + HTML", start: "May 6", due: "May 13" },
-    { id: 234, title: "A2 - CSS + BOOTSTRAP", start: "May 10", due: "May 17" },
-    { id: 345, title: "A3 - JAVASCRIPT + REACT", start: "May 15", due: "May 22" },
-  ];
+  const params = useParams();
+  const courseId = params.cid; // Use the course ID from URL
+
+  // Filter assignments by the course
+  const assignments = assignmentsData.filter((a) => a.course === courseId);
 
   return (
     <div id="wd-assignments" className="p-3">
-
       {/* Search bar and buttons */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <div className="d-flex align-items-center border rounded px-3 py-2 me-3" style={{ maxWidth: "300px" }}>
+        <div
+          className="d-flex align-items-center border rounded px-3 py-2 me-3"
+          style={{ maxWidth: "300px" }}
+        >
           <FaSearch className="me-2 text-muted" />
-          <FormControl placeholder="Search..." className="border-0 shadow-none p-0" />
+          <FormControl
+            placeholder="Search..."
+            className="border-0 shadow-none p-0"
+          />
         </div>
 
         <div className="d-flex align-items-center">
           <Button className="me-2 d-flex align-items-center btn-secondary">
             <BsPlus className="me-1 fs-5" /> Group
           </Button>
-          <Button variant="danger" className="text-white d-flex align-items-center">
+          <Button
+            variant="danger"
+            className="text-white d-flex align-items-center"
+          >
             <BsPlus className="me-1 fs-5" /> Assignment
           </Button>
         </div>
       </div>
 
       <ListGroup className="rounded-0" id="wd-assignments-list">
-
         {/* Assignment Group */}
         <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
           <div className="wd-title d-flex justify-content-between align-items-center px-3 py-3 rounded bg-light border-bottom border-dark">
@@ -101,16 +115,20 @@ export default function Assignments() {
                   <MdOutlineAssignment className="me-3 text-success fs-5 mt-1" />
                   <div>
                     <Link
-                      href={`/Courses/1234/Assignments/${item.id}`}
+                      href={`/Courses/${courseId}/Assignments/${item._id}`}
                       className="fw-bold mb-1 d-block text-decoration-none text-dark"
                     >
                       {item.title}
                     </Link>
                     <div className="small text-muted">
                       <span className="text-danger">Multiple Modules</span> |{" "}
-                      <span className="text-dark"><b>Not available until</b> {item.start} at 12:00am</span>
+                      <span className="text-dark">
+                        <b>Not available until</b> {item.availableDate} at 12:00am
+                      </span>
                       <br />
-                      <span className="text-dark"><b>Due</b> {item.due} at 11:59pm | 100 pts</span>
+                      <span className="text-dark">
+                        <b>Due</b> {item.dueDate} at 11:59pm | {item.points} pts
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -150,7 +168,6 @@ export default function Assignments() {
             ))}
           </ListGroup>
         </ListGroupItem>
-
       </ListGroup>
     </div>
   );
