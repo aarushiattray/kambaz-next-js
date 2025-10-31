@@ -1,19 +1,33 @@
+"use client";
+
+import { useState } from "react";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa6";
 import { BsSlashCircle } from "react-icons/bs";
 import GreenCheckmark from "./GreenCheckmark";
+import ModuleEditor from "./ModuleEditor";
 
-export default function ModulesControls() {
+export default function ModulesControls(
+  { moduleName, setModuleName, addModule }:
+  { moduleName: string; setModuleName: (title: string) => void; addModule: () => void; }
+) {
+  const [show, setShow] = useState(false); // state for ModuleEditor dialog
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   return (
     <div id="wd-modules-controls" className="text-nowrap mb-3">
-      {/* Using btn-secondary so it picks up the Kambaz CSS override for light gray + black text */}
+      {/* Collapse All button */}
       <Button variant="secondary" className="me-2" id="wd-collapse-all">
         Collapse All
       </Button>
+
+      {/* View Progress button */}
       <Button variant="secondary" className="me-2" id="wd-view-progress">
         View Progress
       </Button>
 
+      {/* Publish dropdown */}
       <Dropdown className="me-2 d-inline-block">
         <DropdownToggle variant="secondary" id="wd-publish-all-btn">
           <GreenCheckmark /> Publish All
@@ -37,11 +51,21 @@ export default function ModulesControls() {
         </DropdownMenu>
       </Dropdown>
 
-      {/* Add Module button remains red */}
-      <Button variant="danger" id="wd-add-module-btn">
+      {/* Add Module button opens ModuleEditor dialog */}
+      <Button variant="danger" id="wd-add-module-btn" onClick={handleShow}>
         <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
         Module
       </Button>
+
+      {/* ModuleEditor dialog */}
+      <ModuleEditor
+        show={show}
+        handleClose={handleClose}
+        dialogTitle="Add Module"
+        moduleName={moduleName}
+        setModuleName={setModuleName}
+        addModule={addModule}
+      />
     </div>
   );
 }

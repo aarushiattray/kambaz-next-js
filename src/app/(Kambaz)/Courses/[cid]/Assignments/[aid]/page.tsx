@@ -1,10 +1,11 @@
 "use client";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import assignments from "../../../../Database/assignments.json";
-import courses from "../../../../Database/courses.json";
 
-// Defining types because was getting build errors otherwsie and was not deploying to Vercel
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { addAssignment, updateAssignment } from "../reducer";
+import { v4 as uuidv4 } from "uuid";
+
 interface Assignment {
   _id: string;
   course: string;
@@ -13,197 +14,179 @@ interface Assignment {
   points: number;
   availableDate: string;
   dueDate: string;
-}
-
-interface Course {
-  _id: string;
-  name: string;
+  availableUntil: string;
 }
 
 export default function AssignmentEditor() {
-  const { cid, aid } = useParams();
+  const params = useParams();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const courseId = Array.isArray(params.cid) ? params.cid[0] : params.cid;
+  const aid = Array.isArray(params.aid) ? params.aid[0] : params.aid;
 
-  const assignment = (assignments as Assignment[]).find(
-    (a) => a._id === aid && a.course === cid
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+  const existingAssignment: Assignment | undefined = assignments.find(
+    (a: Assignment) => a._id === aid && a.course === courseId
   );
-  const course = (courses as Course[]).find((c) => c._id === cid);
 
-  if (!assignment || !course) {
-    return <div className="p-4">Assignment not found.</div>;
-  }
-
-  // Map month name to number
-  const monthMap: { [key: string]: string } = {
-    January: "01", February: "02", March: "03", April: "04", May: "05", June: "06",
-    July: "07", August: "08", September: "09", October: "10", November: "11", December: "12"
-  };
-
-  // Convert "May 6" -> "YYYY-MM-DDTHH:mm"
-  const parseDate = (dateStr: string | undefined, endOfDay = false): string => {
+  const parseForInput = (dateStr: string | undefined, endOfDay = false) => {
     if (!dateStr) return "";
-    const parts = dateStr.split(" ");
-    if (parts.length !== 2) return "";
-    const [monthName, dayStr] = parts;
-    const month = monthMap[monthName];
-    if (!month) return "";
-    const day = dayStr.padStart(2, "0");
-    const year = new Date().getFullYear();
-    const hours = endOfDay ? "23" : "00";
-    const minutes = endOfDay ? "59" : "00";
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = endOfDay ? "23" : "00";
+    const min = endOfDay ? "59" : "00";
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
   };
 
-  const availableFrom = parseDate(assignment.availableDate);
-  const dueDate = parseDate(assignment.dueDate, true);
-  const availableUntil = dueDate;
+  const [form, setForm] = useState({
+    title: existingAssignment?.title || "",
+    description: existingAssignment?.description || "",
+    points: existingAssignment?.points || 100,
+    availableDate: parseForInput(existingAssignment?.availableDate),
+    dueDate: parseForInput(existingAssignment?.dueDate, true),
+    availableUntil: parseForInput(existingAssignment?.availableUntil, true),
+  });
+
+  useEffect(() => {
+    if (existingAssignment) {
+      setForm({
+        title: existingAssignment.title,
+        description: existingAssignment.description,
+        points: existingAssignment.points,
+        availableDate: parseForInput(existingAssignment.availableDate),
+        dueDate: parseForInput(existingAssignment.dueDate, true),
+        availableUntil: parseForInput(existingAssignment.availableUntil, true),
+      });
+    }
+  }, [existingAssignment]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value, type } = e.target;
+    setForm((prev) => ({ ...prev, [id]: type === "number" ? Number(value) : value }));
+  };
+
+  const handleSave = () => {
+    if (existingAssignment) {
+      dispatch(updateAssignment({ ...existingAssignment, ...form }));
+    } else {
+      dispatch(addAssignment({ _id: uuidv4(), course: courseId, ...form }));
+    }
+    router.push(`/Courses/${courseId}/Assignments`);
+  };
+
+  const handleCancel = () => {
+    router.push(`/Courses/${courseId}/Assignments`);
+  };
 
   return (
-    <div className="px-4 py-4" style={{ maxWidth: '800px', marginLeft: 0, textAlign: 'left' }}>
+    <div className="px-4 py-4" style={{ maxWidth: "800px", marginLeft: 0, textAlign: "left" }}>
       {/* Assignment Name */}
       <div className="mb-3">
-        <label htmlFor="wd-name" className="form-label fw-bold">Assignment Name</label>
-        <input id="wd-name" defaultValue={assignment.title} className="form-control" />
+        <label htmlFor="title" className="form-label fw-bold">Assignment Name</label>
+        <input id="title" value={form.title} onChange={handleChange} className="form-control" />
       </div>
 
       {/* Description */}
       <div className="mb-3">
         <label className="form-label fw-bold">Description</label>
-        <div
-          id="wd-description"
+        <textarea
+          id="description"
+          value={form.description}
+          onChange={handleChange}
           className="form-control"
-          contentEditable
-          suppressContentEditableWarning
-          style={{ minHeight: '150px', whiteSpace: 'pre-wrap' }}
-        >
-          {assignment.description}
-        </div>
+          style={{ minHeight: "150px", whiteSpace: "pre-wrap" }}
+        />
       </div>
 
       {/* Points */}
       <div className="row mb-3 align-items-center">
-        <label htmlFor="wd-points" className="col-sm-3 col-form-label fw-bold">Points</label>
+        <label htmlFor="points" className="col-sm-3 col-form-label fw-bold">Points</label>
         <div className="col-sm-9">
-          <input id="wd-points" type="number" defaultValue={assignment.points} className="form-control" />
+          <input id="points" type="number" value={form.points} onChange={handleChange} className="form-control" />
         </div>
       </div>
 
       {/* Assignment Group */}
       <div className="row mb-3 align-items-center">
-        <label htmlFor="wd-group" className="col-sm-3 col-form-label fw-bold">Assignment Group</label>
+        <label htmlFor="group" className="col-sm-3 col-form-label fw-bold">Assignment Group</label>
         <div className="col-sm-9">
-          <select id="wd-group" defaultValue="ASSIGNMENTS" className="form-select">
+          <select id="group" defaultValue="ASSIGNMENTS" className="form-select">
             <option>ASSIGNMENTS</option>
           </select>
         </div>
       </div>
 
-      {/* Display Grade As */}
+      {/* Display Grade */}
       <div className="row mb-3 align-items-center">
-        <label htmlFor="wd-display-grade-as" className="col-sm-3 col-form-label fw-bold">Display Grade as</label>
+        <label htmlFor="display-grade" className="col-sm-3 col-form-label fw-bold">Display Grade as</label>
         <div className="col-sm-9">
-          <select id="wd-display-grade-as" defaultValue="Percentage" className="form-select">
+          <select id="display-grade" defaultValue="Percentage" className="form-select">
             <option>Percentage</option>
           </select>
         </div>
       </div>
 
-      {/* Submission Type Section */}
+      {/* Submission Type */}
       <div className="row mb-3 align-items-start">
         <label className="col-sm-3 col-form-label fw-bold">Submission Type</label>
         <div className="col-sm-9">
           <div className="border p-3 rounded">
             <div className="mb-3">
-              <select id="wd-submission-type" defaultValue="Online" className="form-select">
-                <option>Online</option>
-              </select>
+              <select defaultValue="Online" className="form-select"><option>Online</option></select>
             </div>
             <div className="fw-bold mb-2">Online Entry Options</div>
-            <div className="form-check mb-1">
-              <input type="checkbox" id="wd-text-entry" className="form-check-input" />
-              <label htmlFor="wd-text-entry" className="form-check-label">Text Entry</label>
-            </div>
-            <div className="form-check mb-1">
-              <input type="checkbox" id="wd-website-url" className="form-check-input" defaultChecked />
-              <label htmlFor="wd-website-url" className="form-check-label">Website URL</label>
-            </div>
-            <div className="form-check mb-1">
-              <input type="checkbox" id="wd-media-recordings" className="form-check-input" />
-              <label htmlFor="wd-media-recordings" className="form-check-label">Media Recordings</label>
-            </div>
-            <div className="form-check mb-1">
-              <input type="checkbox" id="wd-student-annotation" className="form-check-input" />
-              <label htmlFor="wd-student-annotation" className="form-check-label">Student Annotation</label>
-            </div>
-            <div className="form-check mb-1">
-              <input type="checkbox" id="wd-file-upload" className="form-check-input" />
-              <label htmlFor="wd-file-upload" className="form-check-label">File Uploads</label>
-            </div>
+            <div className="form-check mb-1"><input type="checkbox" className="form-check-input" /><label className="form-check-label">Text Entry</label></div>
+            <div className="form-check mb-1"><input type="checkbox" className="form-check-input" defaultChecked /><label className="form-check-label">Website URL</label></div>
+            <div className="form-check mb-1"><input type="checkbox" className="form-check-input" /><label className="form-check-label">Media Recordings</label></div>
+            <div className="form-check mb-1"><input type="checkbox" className="form-check-input" /><label className="form-check-label">Student Annotation</label></div>
+            <div className="form-check mb-1"><input type="checkbox" className="form-check-input" /><label className="form-check-label">File Uploads</label></div>
           </div>
         </div>
       </div>
 
-      {/* Assign Section */}
+      {/* Assign & Dates */}
       <div className="row mb-3 align-items-start">
         <label className="col-sm-3 col-form-label fw-bold">Assign</label>
         <div className="col-sm-9">
           <div className="border p-3 rounded">
             <div className="mb-3">
-              <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label>
+              <label className="form-label fw-bold">Assign to</label>
               <div className="form-control d-flex align-items-center flex-wrap" style={{ minHeight: '40px' }}>
                 <span className="badge bg-secondary text-dark d-flex align-items-center me-1 mb-1">
                   Everyone
-                  <button
-                    type="button"
-                    className="btn-close btn-close-black btn-sm ms-1"
-                    aria-label="Remove"
-                  ></button>
+                  <button type="button" className="btn-close btn-close-black btn-sm ms-1" aria-label="Remove"></button>
                 </span>
               </div>
             </div>
 
-            {/* Due Date */}
+            {/* Dates */}
             <div className="mb-3">
-              <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label>
-              <input
-                type="datetime-local"
-                id="wd-due-date"
-                defaultValue={dueDate}
-                className="form-control"
-              />
+              <label htmlFor="dueDate" className="form-label fw-bold">Due Date</label>
+              <input type="datetime-local" id="dueDate" value={form.dueDate} onChange={handleChange} className="form-control" />
             </div>
 
-            {/* Available From / Until */}
             <div className="row g-3">
               <div className="col">
-                <label htmlFor="wd-available-from" className="form-label fw-bold">Available from</label>
-                <input
-                  type="datetime-local"
-                  id="wd-available-from"
-                  defaultValue={availableFrom}
-                  className="form-control"
-                />
+                <label htmlFor="availableDate" className="form-label fw-bold">Available from</label>
+                <input type="datetime-local" id="availableDate" value={form.availableDate} onChange={handleChange} className="form-control" />
               </div>
               <div className="col">
-                <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label>
-                <input
-                  type="datetime-local"
-                  id="wd-available-until"
-                  defaultValue={availableUntil}
-                  className="form-control"
-                />
+                <label htmlFor="availableUntil" className="form-label fw-bold">Until</label>
+                <input type="datetime-local" id="availableUntil" value={form.availableUntil} onChange={handleChange} className="form-control" />
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Black line above buttons */}
       <hr className="border-dark mt-4" />
 
-      {/* Bottom-right buttons */}
       <div className="d-flex justify-content-end gap-2">
-        <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary">Cancel</Link>
-        <Link href={`/Courses/${cid}/Assignments`} className="btn btn-danger">Save</Link>
+        <button className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
+        <button className="btn btn-danger" onClick={handleSave}>Save</button>
       </div>
     </div>
   );

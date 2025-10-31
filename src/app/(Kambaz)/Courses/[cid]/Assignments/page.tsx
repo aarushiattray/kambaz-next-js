@@ -1,29 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ListGroup, ListGroupItem, Button, FormControl } from "react-bootstrap";
-import { BsGripVertical, BsPlus } from "react-icons/bs";
+import { useParams, useRouter } from "next/navigation";
+import { ListGroup, ListGroupItem, Button, FormControl, Modal } from "react-bootstrap";
+import { BsGripVertical, BsPlus, BsTrash } from "react-icons/bs";
 import { FaSearch, FaCheckCircle, FaCircle, FaCaretDown } from "react-icons/fa";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { MdOutlineAssignment } from "react-icons/md";
-import assignmentsData from "../../../Database/assignments.json";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteAssignment } from "./reducer";
 import "../../../styles.css";
+import { useState } from "react";
 
-// Inline GreenCheckmark component
+// --- Helper to format ISO date strings to readable "May 10 at 12:00am" ---
+function formatDate(dateStr: string) {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+  const formattedDate = date.toLocaleDateString("en-US", options);
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12 === 0 ? 12 : hours % 12;
+
+  return `${formattedDate} at ${hours}:${minutes}${ampm}`;
+}
+
+// --- Green Checkmark icon ---
 function GreenCheckmark() {
   return (
-    <span
-      className="position-relative d-inline-block me-2"
-      style={{ width: "20px", height: "20px" }}
-    >
+    <span className="position-relative d-inline-block me-2" style={{ width: "20px", height: "20px" }}>
       <FaCircle className="text-white fs-6 position-absolute top-0 start-0" />
       <FaCheckCircle className="text-success fs-5 position-absolute top-0 start-0" />
     </span>
   );
 }
 
-// Top-level control buttons for Assignment header
+// --- Assignment group header buttons ---
 function AssignmentControlButtons() {
   return (
     <div className="d-flex align-items-center">
@@ -36,21 +50,14 @@ function AssignmentControlButtons() {
   );
 }
 
-// Control buttons for other sections
-function OtherControlButtons() {
-  return (
-    <div className="d-flex align-items-center">
-      <BsPlus className="fs-4 me-3" />
-      <IoEllipsisVertical className="fs-4" />
-    </div>
-  );
-}
-
-// Buttons for individual lessons/assignments
-function LessonControlButtons() {
+// --- Buttons for individual lessons/assignments ---
+function LessonControlButtons({ onDelete, isFaculty }: { onDelete: () => void; isFaculty: boolean }) {
   return (
     <div className="d-flex align-items-center float-end">
       <GreenCheckmark />
+      {isFaculty && (
+        <BsTrash className="text-danger fs-5 mx-3" role="button" onClick={onDelete} />
+      )}
       <IoEllipsisVertical className="fs-4" />
     </div>
   );
@@ -58,33 +65,62 @@ function LessonControlButtons() {
 
 export default function Assignments() {
   const params = useParams();
-  const courseId = params.cid; // Use the course ID from URL
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const courseId = params.cid as string;
 
-  // Filter assignments by the course
-  const assignments = assignmentsData.filter((a) => a.course === courseId);
+  // Get current user
+  const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
+
+  // Get assignments from Redux
+  const assignments = useSelector((state: any) =>
+    state.assignmentsReducer.assignments.filter((a: any) => a.course === courseId)
+  );
+
+  // Modal state for delete confirmation
+  const [showModal, setShowModal] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
+
+  const handleDelete = (assignment: any) => {
+    setSelectedAssignment(assignment);
+    setShowModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedAssignment) {
+      dispatch(deleteAssignment(selectedAssignment._id));
+    }
+    setShowModal(false);
+  };
 
   return (
     <div id="wd-assignments" className="p-3">
-      {/* Search bar and buttons */}
+      {/* Search bar and top buttons */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <div
-          className="d-flex align-items-center border rounded px-3 py-2 me-3"
-          style={{ maxWidth: "300px" }}
-        >
+        <div className="d-flex align-items-center border rounded px-3 py-2 me-3" style={{ maxWidth: "300px" }}>
           <FaSearch className="me-2 text-muted" />
-          <FormControl
-            placeholder="Search..."
-            className="border-0 shadow-none p-0"
-          />
+          <FormControl placeholder="Search..." className="border-0 shadow-none p-0" />
         </div>
 
         <div className="d-flex align-items-center">
-          <Button className="me-2 d-flex align-items-center btn-secondary">
+          <Button
+            className="me-2 d-flex align-items-center btn-secondary"
+            onClick={() => {
+              if (currentUser?.role === "FACULTY") {
+                router.push(`/Courses/${courseId}/Assignments/new-group`);
+              }
+            }}
+          >
             <BsPlus className="me-1 fs-5" /> Group
           </Button>
           <Button
             variant="danger"
             className="text-white d-flex align-items-center"
+            onClick={() => {
+              if (currentUser?.role === "FACULTY") {
+                router.push(`/Courses/${courseId}/Assignments/new`);
+              }
+            }}
           >
             <BsPlus className="me-1 fs-5" /> Assignment
           </Button>
@@ -92,7 +128,6 @@ export default function Assignments() {
       </div>
 
       <ListGroup className="rounded-0" id="wd-assignments-list">
-        {/* Assignment Group */}
         <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
           <div className="wd-title d-flex justify-content-between align-items-center px-3 py-3 rounded bg-light border-bottom border-dark">
             <span className="d-flex align-items-center">
@@ -104,7 +139,7 @@ export default function Assignments() {
           </div>
 
           <ListGroup className="wd-lessons rounded-0 mt-0">
-            {assignments.map((item, idx) => (
+            {assignments.map((item: any, idx: number) => (
               <ListGroupItem
                 key={idx}
                 className="wd-lesson d-flex justify-content-between align-items-start px-3 py-3"
@@ -114,61 +149,56 @@ export default function Assignments() {
                   <BsGripVertical className="me-3 fs-4 text-secondary mt-1" />
                   <MdOutlineAssignment className="me-3 text-success fs-5 mt-1" />
                   <div>
-                    <Link
-                      href={`/Courses/${courseId}/Assignments/${item._id}`}
+                    <div
                       className="fw-bold mb-1 d-block text-decoration-none text-dark"
+                      style={{ cursor: currentUser?.role === "FACULTY" ? "pointer" : "default" }}
+                      onClick={() => {
+                        if (currentUser?.role === "FACULTY") {
+                          router.push(`/Courses/${courseId}/Assignments/${item._id}`);
+                        }
+                      }}
                     >
                       {item.title}
-                    </Link>
+                    </div>
                     <div className="small text-muted">
                       <span className="text-danger">Multiple Modules</span> |{" "}
                       <span className="text-dark">
-                        <b>Not available until</b> {item.availableDate} at 12:00am
+                        <b>Not available until</b> {formatDate(item.availableDate)}
                       </span>
                       <br />
                       <span className="text-dark">
-                        <b>Due</b> {item.dueDate} at 11:59pm | {item.points} pts
+                        <b>Due</b> {formatDate(item.dueDate)} | {item.points} pts
                       </span>
                     </div>
                   </div>
                 </div>
-                <LessonControlButtons />
-              </ListGroupItem>
-            ))}
-          </ListGroup>
-        </ListGroupItem>
-
-        {/* Other Items */}
-        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-          <div className="wd-title d-flex justify-content-between align-items-center px-3 py-3 rounded bg-light border-top border-bottom border-dark">
-            <span className="d-flex align-items-center">
-              <BsGripVertical className="me-2 fs-3" />
-              <FaCaretDown className="me-2" />
-              <span className="fw-bold fs-6">Other Assignments</span>
-            </span>
-            <OtherControlButtons />
-          </div>
-
-          <ListGroup className="wd-lessons rounded-0 mt-0">
-            {["Quizzes", "Exams", "Projects"].map((item, idx) => (
-              <ListGroupItem
-                key={idx}
-                className="wd-lesson d-flex justify-content-between align-items-start px-3 py-3"
-                style={{ borderLeft: "3px solid green" }}
-              >
-                <div className="d-flex align-items-start">
-                  <BsGripVertical className="me-3 fs-4 text-secondary mt-1" />
-                  <MdOutlineAssignment className="me-3 text-success fs-5 mt-1" />
-                  <div>
-                    <div className="fw-bold fs-6">{item}</div>
-                  </div>
-                </div>
-                <LessonControlButtons />
+                <LessonControlButtons
+                  onDelete={() => handleDelete(item)}
+                  isFaculty={currentUser?.role === "FACULTY"}
+                />
               </ListGroupItem>
             ))}
           </ListGroup>
         </ListGroupItem>
       </ListGroup>
+
+      {/* Delete confirmation modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Assignment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete <strong>{selectedAssignment?.title}</strong>?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Yes, Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

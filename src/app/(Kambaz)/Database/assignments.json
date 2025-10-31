@@ -6,7 +6,8 @@
     "description": "(My Placeholder Description): Complete the propulsion system calculations and submit the report.",
     "points": 100,
     "availableDate": "May 6",
-    "dueDate": "May 13"
+    "dueDate": "May 13",
+    "availableUntil": "May 14"
   },
   {
     "_id": "A102",
@@ -15,7 +16,8 @@
     "description": "(My Placeholder Description): Analyze combustion efficiency and provide a detailed report.",
     "points": 100,
     "availableDate": "May 10",
-    "dueDate": "May 17"
+    "dueDate": "May 17",
+    "availableUntil": "May 18"
   },
   {
     "_id": "A103",
@@ -24,7 +26,8 @@
     "description": "(My Placeholder Description): Design a nozzle based on provided specifications and submit the CAD model.",
     "points": 100,
     "availableDate": "May 15",
-    "dueDate": "May 22"
+    "dueDate": "May 22",
+    "availableUntil": "May 23"
   },
   {
     "_id": "A201",
@@ -33,7 +36,8 @@
     "description": "(My Placeholder Description): Take the quiz covering basic aerodynamic principles.",
     "points": 100,
     "availableDate": "May 6",
-    "dueDate": "May 13"
+    "dueDate": "May 13",
+    "availableUntil": "May 14"
   },
   {
     "_id": "A202",
@@ -42,7 +46,8 @@
     "description": "(My Placeholder Description): Perform flow simulations and analyze the results.",
     "points": 100,
     "availableDate": "May 10",
-    "dueDate": "May 17"
+    "dueDate": "May 17",
+    "availableUntil": "May 18"
   },
   {
     "_id": "A203",
@@ -51,7 +56,8 @@
     "description": "(My Placeholder Description): Analyze thermal effects and provide a comprehensive report.",
     "points": 100,
     "availableDate": "May 15",
-    "dueDate": "May 22"
+    "dueDate": "May 22",
+    "availableUntil": "May 23"
   },
   {
     "_id": "A301",
@@ -60,7 +66,8 @@
     "description": "(My Placeholder Description): Complete structural design calculations and submit the report.",
     "points": 100,
     "availableDate": "May 6",
-    "dueDate": "May 13"
+    "dueDate": "May 13",
+    "availableUntil": "May 14"
   },
   {
     "_id": "A302",
@@ -69,7 +76,8 @@
     "description": "(My Placeholder Description): Perform orbital mechanics calculations and submit findings.",
     "points": 100,
     "availableDate": "May 10",
-    "dueDate": "May 17"
+    "dueDate": "May 17",
+    "availableUntil": "May 18"
   },
   {
     "_id": "A303",
@@ -78,6 +86,7 @@
     "description": "(My Placeholder Description): Complete the systems engineering exam covering all modules.",
     "points": 100,
     "availableDate": "May 15",
-    "dueDate": "May 22"
+    "dueDate": "May 22",
+    "availableUntil": "May 23"
   }
 ]
