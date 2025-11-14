@@ -44,7 +44,7 @@ export default function Labs() {
         </li>
         <li>
           <Link href="https://kambaz-node-server-app-oave.onrender.com" id="wd-rootserver" target="_blank" rel="noopener noreferrer">
-            Link to root server
+            Link to Root Server
           </Link>
         </li>
       </ul>
