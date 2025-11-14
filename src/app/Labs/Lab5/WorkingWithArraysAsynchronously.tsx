@@ -1,4 +1,4 @@
-"use client";
+"use client"; //needed for vercel deployment 
 import React, { useState, useEffect } from "react";
 import * as client from "./client";
 import { ListGroup, ListGroupItem, FormControl } from "react-bootstrap";
@@ -22,7 +22,7 @@ export default function WorkingWithArraysAsynchronously() {
     } catch (error: any) {
       setErrorMessage(error.response.data.message);
     }
-  };
+  }; 
   
   const deleteTodo = async (todo: any) => {
     try {
