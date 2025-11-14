@@ -77,6 +77,7 @@ export default function Profile() {
           <select
             className="form-control mb-2"
             id="wd-role"
+            value = {profile.role}
             onChange={(e) => setProfile({ ...profile, role: e.target.value })}
           >
             <option value="USER">User</option>
