@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { enrollments } from "../Database";
+import { RootState } from "../../(Kambaz)/store";
  
 interface Enrollment {
   _id: string;
@@ -41,7 +42,7 @@ const enrollmentsSlice = createSlice({
 export const { enrollCourse, unenrollCourse, setEnrollments } = enrollmentsSlice.actions;
  
 
-export const selectUserEnrollments = (state: any, userId: string) =>
+export const selectUserEnrollments = (state: RootState, userId: string) =>
   state.enrollmentsReducer.enrollments.filter((e: Enrollment) => e.user === userId);
  
 export default enrollmentsSlice.reducer;

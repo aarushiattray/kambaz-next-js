@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import * as client from "../Assignments/client";
+import { setAssignments } from "../Assignments/reducer";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ListGroup, ListGroupItem, Button, FormControl, Modal } from "react-bootstrap";
 import { BsGripVertical, BsPlus, BsTrash } from "react-icons/bs";
@@ -8,22 +11,19 @@ import { FaSearch, FaCheckCircle, FaCircle, FaCaretDown } from "react-icons/fa";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { MdOutlineAssignment } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteAssignment } from "./reducer";
 import "../../../styles.css";
-import { useState } from "react";
+import { RootState } from "../../../store";
 
-// --- Helper to format ISO date strings to readable "May 10 at 12:00am" ---
+// --- Helper to format ISO date strings ---
 function formatDate(dateStr: string) {
   if (!dateStr) return "";
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
   const formattedDate = date.toLocaleDateString("en-US", options);
-
   let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, "0");
   const ampm = hours >= 12 ? "pm" : "am";
   hours = hours % 12 === 0 ? 12 : hours % 12;
-
   return `${formattedDate} at ${hours}:${minutes}${ampm}`;
 }
 
@@ -50,7 +50,7 @@ function AssignmentControlButtons() {
   );
 }
 
-// --- Buttons for individual lessons/assignments ---
+// --- Buttons for individual assignments ---
 function LessonControlButtons({ onDelete, isFaculty }: { onDelete: () => void; isFaculty: boolean }) {
   return (
     <div className="d-flex align-items-center float-end">
@@ -69,17 +69,30 @@ export default function Assignments() {
   const dispatch = useDispatch();
   const courseId = params.cid as string;
 
-  // Get current user
-  const currentUser = useSelector((state: any) => state.accountReducer.currentUser);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
 
-  // Get assignments from Redux
-  const assignments = useSelector((state: any) =>
+  // Redux
+  const assignments = useSelector((state: RootState) =>
     state.assignmentsReducer.assignments.filter((a: any) => a.course === courseId)
   );
 
-  // Modal state for delete confirmation
-  const [showModal, setShowModal] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
+  const currentUser = useSelector((state: RootState) => state.accountReducer.currentUser) as { role: string } | null;
+
+  // --- CRUD Operations ---
+  const fetchAssignments = async () => {
+    const data = await client.findAssignmentsForCourse(courseId);
+    dispatch(setAssignments(data));
+  };
+
+  const onRemoveAssignment = async (assignmentId: string) => {
+    await client.deleteAssignment(assignmentId);
+    dispatch(setAssignments(assignments.filter((a: any) => a._id !== assignmentId)));
+  };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
   const handleDelete = (assignment: any) => {
     setSelectedAssignment(assignment);
@@ -87,9 +100,7 @@ export default function Assignments() {
   };
 
   const confirmDelete = () => {
-    if (selectedAssignment) {
-      dispatch(deleteAssignment(selectedAssignment._id));
-    }
+    if (selectedAssignment) onRemoveAssignment(selectedAssignment._id);
     setShowModal(false);
   };
 
@@ -101,26 +112,17 @@ export default function Assignments() {
           <FaSearch className="me-2 text-muted" />
           <FormControl placeholder="Search..." className="border-0 shadow-none p-0" />
         </div>
-
         <div className="d-flex align-items-center">
           <Button
             className="me-2 d-flex align-items-center btn-secondary"
-            onClick={() => {
-              if (currentUser?.role === "FACULTY") {
-                router.push(`/Courses/${courseId}/Assignments/new-group`);
-              }
-            }}
+            onClick={() => currentUser?.role === "FACULTY" && router.push(`/Courses/${courseId}/Assignments/new-group`)}
           >
             <BsPlus className="me-1 fs-5" /> Group
           </Button>
           <Button
             variant="danger"
             className="text-white d-flex align-items-center"
-            onClick={() => {
-              if (currentUser?.role === "FACULTY") {
-                router.push(`/Courses/${courseId}/Assignments/new`);
-              }
-            }}
+            onClick={() => currentUser?.role === "FACULTY" && router.push(`/Courses/${courseId}/Assignments/new`)}
           >
             <BsPlus className="me-1 fs-5" /> Assignment
           </Button>
@@ -152,11 +154,7 @@ export default function Assignments() {
                     <div
                       className="fw-bold mb-1 d-block text-decoration-none text-dark"
                       style={{ cursor: currentUser?.role === "FACULTY" ? "pointer" : "default" }}
-                      onClick={() => {
-                        if (currentUser?.role === "FACULTY") {
-                          router.push(`/Courses/${courseId}/Assignments/${item._id}`);
-                        }
-                      }}
+                      onClick={() => currentUser?.role === "FACULTY" && router.push(`/Courses/${courseId}/Assignments/${item._id}`)}
                     >
                       {item.title}
                     </div>

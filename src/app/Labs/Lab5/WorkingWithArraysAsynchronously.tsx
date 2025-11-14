@@ -23,7 +23,7 @@ export default function WorkingWithArraysAsynchronously() {
       setErrorMessage(error.response.data.message);
     }
   };
-
+  
   const deleteTodo = async (todo: any) => {
     try {
       await client.deleteTodo(todo);

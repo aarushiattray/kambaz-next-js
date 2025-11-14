@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { addAssignment, updateAssignment } from "../reducer";
-import { v4 as uuidv4 } from "uuid";
+import { addAssignment, setAssignments } from "../reducer";
+import { RootState } from "../../../../store";
+import * as client from "../client";
 
 interface Assignment {
-  _id: string;
+  _id?: string;
   course: string;
   title: string;
   description: string;
@@ -22,12 +23,11 @@ export default function AssignmentEditor() {
   const router = useRouter();
   const dispatch = useDispatch();
   const courseId = Array.isArray(params.cid) ? params.cid[0] : params.cid;
+  if (!courseId) throw new Error("Missing courseId in URL");
   const aid = Array.isArray(params.aid) ? params.aid[0] : params.aid;
 
-  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
-  const existingAssignment: Assignment | undefined = assignments.find(
-    (a: Assignment) => a._id === aid && a.course === courseId
-  );
+  const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
+  const existingAssignment = assignments.find(a => a._id === aid && a.course === courseId);
 
   const parseForInput = (dateStr: string | undefined, endOfDay = false) => {
     if (!dateStr) return "";
@@ -63,24 +63,43 @@ export default function AssignmentEditor() {
     }
   }, [existingAssignment]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value, type } = e.target;
-    setForm((prev) => ({ ...prev, [id]: type === "number" ? Number(value) : value }));
+    setForm(prev => ({ ...prev, [id]: type === "number" ? Number(value) : value }));
   };
 
-  const handleSave = () => {
-    if (existingAssignment) {
-      dispatch(updateAssignment({ ...existingAssignment, ...form }));
-    } else {
-      dispatch(addAssignment({ _id: uuidv4(), course: courseId, ...form }));
+  const handleSave = async () => {
+    try {
+      if (!form.title.trim()) {
+        alert("Assignment title cannot be empty");
+        return;
+      }
+
+      let savedAssignment;
+      if (existingAssignment) {
+        savedAssignment = await client.updateAssignment({ ...existingAssignment, ...form });
+      } else {
+        savedAssignment = await client.createAssignmentForCourse(courseId, { ...form, course: courseId });
+      }
+
+      if (!savedAssignment) throw new Error("No data returned from server");
+
+      if (existingAssignment) {
+        const newAssignments = assignments.map(a => a._id === savedAssignment._id ? savedAssignment : a);
+        dispatch(setAssignments(newAssignments));
+      } else {
+        dispatch(addAssignment(savedAssignment));
+      }
+
+      router.push(`/Courses/${courseId}/Assignments`);
+    } catch (error: any) {
+      console.error("Error saving assignment:", error?.response?.data || error.message);
+      alert("There was a problem saving the assignment. Please try again.");
     }
-    router.push(`/Courses/${courseId}/Assignments`);
   };
 
-  const handleCancel = () => {
-    router.push(`/Courses/${courseId}/Assignments`);
-  };
-
+  const handleCancel = () => router.push(`/Courses/${courseId}/Assignments`);
+  
   return (
     <div className="px-4 py-4" style={{ maxWidth: "800px", marginLeft: 0, textAlign: "left" }}>
       {/* Assignment Name */}
