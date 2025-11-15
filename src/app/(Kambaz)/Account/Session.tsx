@@ -12,13 +12,9 @@ export default function Session({ children }: { children: any }) {
       const currentUser = await client.profile();
       dispatch(setCurrentUser(currentUser));
     } catch (err: any) {
-      // Ignore 401 (not logged in), log anything else
-      if (err?.response?.status !== 401) {
-        console.error(err);
-      }
-    } finally {
-      setPending(false);
+      console.error(err);
     }
+    setPending(false);
   };
 
   useEffect(() => {
