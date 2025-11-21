@@ -1,36 +1,10 @@
-"use client";
+"use client"
+import { useState, useEffect } from "react";
 import React from "react";
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
-import { useParams } from "next/navigation";
-import * as db from "../../../../Database/";
 
-// Define the User and Enrollment types (was getting build errors otherwise)
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  loginId: string;
-  section: string;
-  role: string;
-  lastActivity: string;
-  totalActivity: string;
-}
-
-interface Enrollment {
-  user: string;   // user ID
-  course: string; // course ID
-}
-
-export default function PeopleTable() {
-  const { cid } = useParams();
-
-  // Cast db to proper types -- was getting build errors without this part
-  const { users, enrollments } = db as {
-    users: User[];
-    enrollments: Enrollment[];
-  };
-
+export default function PeopleTable({ users = [], fetchUsers }: { users?: any[]; fetchUsers: () => void; }) {
   return (
     <div id="wd-people-table">
       <Table striped>
@@ -46,13 +20,7 @@ export default function PeopleTable() {
         </thead>
         <tbody>
           {users
-            .filter((usr: User) =>
-              enrollments.some(
-                (enrollment: Enrollment) =>
-                  enrollment.user === usr._id && enrollment.course === cid
-              )
-            )
-            .map((user: User) => (
+            .map((user: any) => (
               <tr key={user._id}>
                 <td className="wd-full-name text-nowrap">
                   <FaUserCircle className="me-2 fs-1 text-secondary" />
