@@ -1,4 +1,4 @@
-"use client"; //need this 
+"use client"; 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Nav, NavItem, NavLink } from "react-bootstrap";

@@ -1,34 +1,25 @@
 import axios from "axios";
+const axiosWithCredentials = axios.create({ withCredentials: true });
 
-const BASE_URL = process.env.NEXT_PUBLIC_HTTP_SERVER;
-if (!BASE_URL) throw new Error("NEXT_PUBLIC_HTTP_SERVER is not defined");
+const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
+const ASSIGNMENTS_API = `${HTTP_SERVER}/api`;
 
-// Defining a simple Assignment type 
-export interface Assignment {
-  _id?: string;
-  title: string;
-  description?: string;
-  dueDate?: string;
-  course?: string;
-}
-
-export async function findAssignmentsForCourse(courseId: string): Promise<Assignment[]> {
-  const res = await axios.get<Assignment[]>(`${BASE_URL}/api/courses/${courseId}/assignments`);
+export const findAssignmentsForCourse = async (courseId: string) => {
+  const res = await axiosWithCredentials.get(`${ASSIGNMENTS_API}/courses/${courseId}/assignments`);
   return res.data;
-}
+};
 
-export async function createAssignmentForCourse(courseId: string, assignment: Assignment): Promise<Assignment> {
-  const res = await axios.post<Assignment>(`${BASE_URL}/api/courses/${courseId}/assignments`, assignment);
+export const createAssignment = async (courseId: string, assignment: any) => {
+  const res = await axiosWithCredentials.post(`${ASSIGNMENTS_API}/courses/${courseId}/assignments`, assignment);
   return res.data;
-}
+};
 
-export async function updateAssignment(assignment: Assignment): Promise<Assignment> {
-  if (!assignment._id) throw new Error("Assignment must have _id to update");
-  const res = await axios.put<Assignment>(`${BASE_URL}/api/assignments/${assignment._id}`, assignment);
+export const updateAssignment = async (assignmentId: string, updates: any) => {
+  const res = await axiosWithCredentials.put(`${ASSIGNMENTS_API}/assignments/${assignmentId}`, updates);
   return res.data;
-}
+};
 
-export async function deleteAssignment(assignmentId: string): Promise<{ success: boolean }> {
-  const res = await axios.delete<{ success: boolean }>(`${BASE_URL}/api/assignments/${assignmentId}`);
+export const deleteAssignment = async (assignmentId: string) => {
+  const res = await axiosWithCredentials.delete(`${ASSIGNMENTS_API}/assignments/${assignmentId}`);
   return res.data;
-}
+};
