@@ -1,8 +1,16 @@
+// Quiz List Page - Aarushi
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ListGroup, ListGroupItem, Button, FormControl, Modal, Dropdown } from "react-bootstrap";
+import {
+  ListGroup,
+  ListGroupItem,
+  Button,
+  FormControl,
+  Modal,
+  Dropdown,
+} from "react-bootstrap";
 import { BsPlus, BsGripVertical } from "react-icons/bs";
 import { FaCaretDown, FaCheckCircle, FaCircle } from "react-icons/fa";
 import { IoEllipsisVertical, IoRocketOutline } from "react-icons/io5";
@@ -14,7 +22,10 @@ import "../../../styles.css";
 // --- Green Checkmark icon (matching assignments) ---
 function GreenCheckmark({ faded = false }: { faded?: boolean }) {
   return (
-    <span className="position-relative d-inline-block me-2" style={{ width: "20px", height: "20px", opacity: faded ? 0.3 : 1 }}>
+    <span
+      className="position-relative d-inline-block me-2"
+      style={{ width: "20px", height: "20px", opacity: faded ? 0.3 : 1 }}
+    >
       <FaCircle className="text-white fs-6 position-absolute top-0 start-0" />
       <FaCheckCircle className="text-success fs-5 position-absolute top-0 start-0" />
     </span>
@@ -56,7 +67,9 @@ export default function Quizzes() {
   const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
-  const currentUser = useSelector((state: RootState) => state.accountReducer.currentUser) as { role: string; _id: string } | null;
+  const currentUser = useSelector(
+    (state: RootState) => state.accountReducer.currentUser
+  ) as { role: string; _id: string } | null;
 
   const fetchQuizzes = async () => {
     if (!courseId) return;
@@ -91,14 +104,14 @@ export default function Quizzes() {
     if (currentUser?.role !== "FACULTY") return;
     const newQuiz = await client.createQuiz(courseId, { title: "New Quiz" });
     fetchQuizzes();
-    router.push(`/Courses/${courseId}/Quizzes/${newQuiz._id}/Editor`);
+    router.push(`/Courses/${courseId}/Quizzes/${newQuiz._id}`);
   };
-
+  
   const handleEdit = (quizId: string) => {
-    router.push(`/Courses/${courseId}/Quizzes/${quizId}/Editor`);
+    router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
     setDropdownOpen(null);
   };
-
+  
   const handleQuizClick = (quizId: string) => {
     router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
   };
@@ -115,7 +128,11 @@ export default function Quizzes() {
         <div className="d-flex align-items-center gap-1">
           {currentUser?.role === "FACULTY" && (
             <>
-              <Button variant="danger" className="d-flex align-items-center" onClick={handleAddQuiz}>
+              <Button
+                variant="danger"
+                className="d-flex align-items-center"
+                onClick={handleAddQuiz}
+              >
                 <BsPlus className="fs-5 me-1" /> Quiz
               </Button>
               <Button variant="light" className="border">
@@ -150,17 +167,22 @@ export default function Quizzes() {
               const now = new Date();
               const availableDate = new Date(quiz.availableDate || now);
               const availableUntil = new Date(quiz.availableUntil || now);
-              let availabilityText = "";
 
+              let availabilityText = "";
               if (now < availableDate) {
-                availabilityText = `Not available until ${formatDate(quiz.availableDate)}`;
+                availabilityText = `Not available until ${formatDate(
+                  quiz.availableDate
+                )}`;
               } else if (now > availableUntil) {
                 availabilityText = "Closed";
               } else {
                 availabilityText = "Available";
               }
 
-              const score = currentUser?.role === "STUDENT" ? quiz.studentScores?.[currentUser._id] : null;
+              const score =
+                currentUser?.role === "STUDENT"
+                  ? quiz.studentScores?.[currentUser._id]
+                  : null;
 
               return (
                 <ListGroupItem
@@ -170,7 +192,10 @@ export default function Quizzes() {
                 >
                   <div className="d-flex align-items-start w-100">
                     <BsGripVertical className="me-3 fs-4 text-secondary mt-1" />
-                    <IoRocketOutline className="me-3 text-success fs-5 mt-1" style={{ transform: "rotate(-45deg)" }} />
+                    <IoRocketOutline
+                      className="me-3 text-success fs-5 mt-1"
+                      style={{ transform: "rotate(-45deg)" }}
+                    />
                     <div className="flex-grow-1">
                       <div
                         className="fw-bold mb-1"
@@ -185,10 +210,19 @@ export default function Quizzes() {
                         </span>
                         {" | "}
                         <span className="text-dark">
-                          <b>Due</b> {quiz.availableUntil ? formatDate(quiz.availableUntil) : <span className="text-danger">Multiple Dates</span>}
+                          <b>Due</b>{" "}
+                          {quiz.availableUntil ? (
+                            formatDate(quiz.availableUntil)
+                          ) : (
+                            <span className="text-danger">Multiple Dates</span>
+                          )}
                         </span>
                         {" | "}
-                        {quiz.points} pts | {quiz.numberOfQuestions} Questions
+                        {quiz.points} pts |{" "}
+                        {quiz.numberOfQuestions ??
+                          quiz.questions?.length ??
+                          0}{" "}
+                        Questions
                         {score != null && (
                           <>
                             {" | "}
@@ -198,6 +232,7 @@ export default function Quizzes() {
                       </div>
                     </div>
                   </div>
+
                   <div className="d-flex align-items-center">
                     {currentUser?.role === "FACULTY" ? (
                       <>
@@ -209,12 +244,22 @@ export default function Quizzes() {
                           {quiz.published ? (
                             <GreenCheckmark />
                           ) : (
-                            <span style={{ fontSize: "1.25rem", marginRight: "8px" }}>🚫</span>
+                            <span
+                              style={{
+                                fontSize: "1.25rem",
+                                marginRight: "8px",
+                              }}
+                            >
+                              🚫
+                            </span>
                           )}
                         </span>
+
                         <Dropdown
                           show={dropdownOpen === quiz._id}
-                          onToggle={(isOpen) => setDropdownOpen(isOpen ? quiz._id : null)}
+                          onToggle={(isOpen) =>
+                            setDropdownOpen(isOpen ? quiz._id : null)
+                          }
                         >
                           <Dropdown.Toggle
                             as="span"
@@ -224,9 +269,15 @@ export default function Quizzes() {
                             <IoEllipsisVertical className="fs-4" />
                           </Dropdown.Toggle>
                           <Dropdown.Menu align="end">
-                            <Dropdown.Item onClick={() => handleEdit(quiz._id)}>Edit</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleDelete(quiz)}>Delete</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleTogglePublish(quiz)}>
+                            <Dropdown.Item onClick={() => handleEdit(quiz._id)}>
+                              Edit
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleDelete(quiz)}>
+                              Delete
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                              onClick={() => handleTogglePublish(quiz)}
+                            >
                               {quiz.published ? "Unpublish" : "Publish"}
                             </Dropdown.Item>
                           </Dropdown.Menu>
@@ -248,7 +299,8 @@ export default function Quizzes() {
           <Modal.Title>Delete Quiz</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete <strong>{selectedQuiz?.title}</strong>?
+          Are you sure you want to delete{" "}
+          <strong>{selectedQuiz?.title}</strong>?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
