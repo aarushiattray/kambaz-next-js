@@ -1,1 +1,1 @@
-// Quiz Editor - Bhavya/Sandra
+// Quiz Details Editor - Emily 
