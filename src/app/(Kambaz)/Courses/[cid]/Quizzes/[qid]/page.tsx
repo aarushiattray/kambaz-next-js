@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import * as client from "../client";
@@ -18,37 +18,13 @@ export default function QuizDetails() {
     (state: RootState) => state.accountReducer.currentUser
   ) as { role: string; _id: string } | null;
 
-  const [quiz, setQuiz] = useState<any>({
-    title: "",
-    type: "Graded Quiz",
-    points: 0,
-    assignmentGroup: "Quizzes",
-    shuffleAnswers: true,
-    timeLimit: 20,
-    multipleAttempts: false,
-    howManyAttempts: 1,
-    showCorrectAnswers: false,
-    accessCode: "",
-    oneQuestionAtATime: true,
-    webcamRequired: false,
-    lockQuestionsAfterAnswering: false,
-    availableDate: "",
-    dueDate: "",
-    availableUntil: "",
-    questions: [],
-  });
+  const [quiz, setQuiz] = useState<any>(null);
 
-  // Fetch quiz details
   const fetchQuiz = async () => {
     if (!quizId) return;
     const data = await client.findQuizById(quizId);
     if (data) {
-      setQuiz({
-        ...quiz,
-        ...data,
-        points:
-          data.questions?.reduce((sum: number, q: any) => sum + (q.points || 0), 0) || 0,
-      });
+      setQuiz(data);
     }
   };
 
@@ -56,140 +32,189 @@ export default function QuizDetails() {
     fetchQuiz();
   }, [quizId]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setQuiz((prev: any) => ({
-      ...prev,
-      [name]:
-        type === "checkbox" ? checked : type === "number" ? parseInt(value) : value,
-    }));
+  const handlePreview = () => {
+    router.push(`/Courses/${courseId}/Quizzes/${quizId}/Preview`);
   };
 
-  const handleSave = async () => {
-    await client.updateQuiz(quizId, quiz);
-    router.push(`/Courses/${courseId}/Quizzes`);
+  const handleEdit = () => {
+    router.push(`/Courses/${courseId}/Quizzes/${quizId}/Editor`);
   };
 
-  if (!currentUser) return null;
+  const handleStartQuiz = () => {
+    router.push(`/Courses/${courseId}/Quizzes/${quizId}/start`);
+  };
+
+  if (!currentUser || !quiz) return <div className="p-3">Loading...</div>;
+
+  // Format date helper
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    const options: Intl.DateTimeFormatOptions = { 
+      month: "short", 
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true
+    };
+    return date.toLocaleDateString("en-US", options);
+  };
+
+  // Calculate total points
+  const totalPoints = quiz.questions?.reduce(
+    (sum: number, q: any) => sum + (q.points || 0), 
+    0
+  ) || 0;
 
   // STUDENT VIEW
   if (currentUser.role === "STUDENT") {
-    return (<div className="p-3"> <h3>{quiz.title}</h3> <p>Points: {quiz.points}</p> <p>
-      Available: {quiz.availableDate ? new Date(quiz.availableDate).toLocaleString() : "N/A"}{" "}
-      until {quiz.availableUntil ? new Date(quiz.availableUntil).toLocaleString() : "N/A"} </p>
-      <Button
-        onClick={() => router.push(`/Courses/${courseId}/Quizzes/${quizId}/start`)}
-        disabled={!(quiz.published && (!quiz.availableDate || new Date() >= new Date(quiz.availableDate)))}
-      >
-        Start Quiz </Button> </div>
+    const now = new Date();
+    const availableDate = quiz.availableDate ? new Date(quiz.availableDate) : null;
+    const availableUntil = quiz.availableUntil ? new Date(quiz.availableUntil) : null;
+    const isAvailable = quiz.published && (!availableDate || now >= availableDate) && (!availableUntil || now <= availableUntil);
+
+    return (
+      <div className="p-4">
+        <h3 className="mb-4">{quiz.title}</h3>
+
+        {/* Student Info Table */}
+        <Table bordered className="mb-4">
+          <tbody>
+            <tr>
+              <td className="text-end fw-bold" style={{ width: "200px" }}>Due</td>
+              <td>{formatDate(quiz.dueDate)}</td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Points</td>
+              <td>{totalPoints}</td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Questions</td>
+              <td>{quiz.questions?.length || 0}</td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Available from</td>
+              <td>{formatDate(quiz.availableDate)}</td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Until</td>
+              <td>{formatDate(quiz.availableUntil)}</td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Time Limit</td>
+              <td>{typeof quiz.timeLimit === 'number' ? quiz.timeLimit : 20} Minutes</td>
+            </tr>
+          </tbody>
+        </Table>
+
+        {/* Start Quiz Button */}
+        <div className="text-center">
+          <Button 
+            variant="danger" 
+            size="lg"
+            onClick={handleStartQuiz}
+            disabled={!isAvailable}
+          >
+            {isAvailable ? "Start Quiz" : "Quiz Not Available"}
+          </Button>
+        </div>
+      </div>
     );
   }
 
   // FACULTY VIEW
-  return (<div className="p-3"> <h3>{quiz.title}</h3> <Form> <Row className="mb-3"> <Col md={6}>
-    <Form.Group>
-      <Form.Label>Quiz Type</Form.Label>
-      <Form.Select name="type" value={quiz.type} onChange={handleChange}> <option>Graded Quiz</option> <option>Practice Quiz</option> <option>Graded Survey</option> <option>Ungraded Survey</option>
-      </Form.Select>
-    </Form.Group> </Col> <Col md={6}>
-      <Form.Group>
-        <Form.Label>Points</Form.Label>
-        <Form.Control type="number" value={quiz.points} readOnly />
-      </Form.Group> </Col> </Row>
-    <Row className="mb-3">
-      <Col md={6}>
-        <Form.Group>
-          <Form.Label>Assignment Group</Form.Label>
-          <Form.Select name="assignmentGroup" value={quiz.assignmentGroup} onChange={handleChange}>
-            <option>Quizzes</option>
-            <option>Exams</option>
-            <option>Assignments</option>
-            <option>Project</option>
-          </Form.Select>
-        </Form.Group>
-      </Col>
-      <Col md={6}>
-        <Form.Group>
-          <Form.Label>Shuffle Answers</Form.Label>
-          <Form.Check type="checkbox" name="shuffleAnswers" checked={quiz.shuffleAnswers} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-    </Row>
+  return (
+    <div className="p-4">
+      {/* Header with Preview and Edit buttons */}
+      <div className="d-flex justify-content-end mb-3 gap-2">
+        <Button variant="light" className="border" onClick={handlePreview}>
+          Preview
+        </Button>
+        <Button variant="light" className="border" onClick={handleEdit}>
+          ✏️ Edit
+        </Button>
+      </div>
 
-    <Row className="mb-3">
-      <Col md={4}>
-        <Form.Group>
-          <Form.Label>Time Limit (minutes)</Form.Label>
-          <Form.Control type="number" name="timeLimit" value={quiz.timeLimit} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Label>Multiple Attempts</Form.Label>
-          <Form.Check type="checkbox" name="multipleAttempts" checked={quiz.multipleAttempts} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Label>How Many Attempts</Form.Label>
-          <Form.Control
-            type="number"
-            name="howManyAttempts"
-            value={quiz.howManyAttempts}
-            onChange={handleChange}
-            disabled={!quiz.multipleAttempts}
-          />
-        </Form.Group>
-      </Col>
-    </Row>
+      {/* Quiz Title */}
+      <h3 className="mb-4">{quiz.title}</h3>
 
-    <Row className="mb-3">
-      <Col md={4}>
-        <Form.Group>
-          <Form.Check type="checkbox" label="Show Correct Answers" name="showCorrectAnswers" checked={quiz.showCorrectAnswers} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Label>Access Code</Form.Label>
-          <Form.Control type="text" name="accessCode" value={quiz.accessCode} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Check type="checkbox" label="One Question at a Time" name="oneQuestionAtATime" checked={quiz.oneQuestionAtATime} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-    </Row>
+      {/* Quiz Details Table */}
+      <Table bordered className="mb-4">
+        <tbody>
+          <tr>
+            <td className="text-end fw-bold" style={{ width: "200px" }}>Quiz Type</td>
+            <td>{quiz.type || "Graded Quiz"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Points</td>
+            <td>{totalPoints}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Assignment Group</td>
+            <td>{quiz.assignmentGroup || "QUIZZES"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Shuffle Answers</td>
+            <td>{quiz.shuffleAnswers ? "Yes" : "No"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Time Limit</td>
+            <td>{typeof quiz.timeLimit === 'number' ? quiz.timeLimit : 20} Minutes</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Multiple Attempts</td>
+            <td>{quiz.multipleAttempts ? "Yes" : "No"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">View Responses</td>
+            <td>Always</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Show Correct Answers</td>
+            <td>{quiz.showCorrectAnswers ? "Immediately" : "Never"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">One Question at a Time</td>
+            <td>{quiz.oneQuestionAtATime ? "Yes" : "No"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Require Respondus LockDown Browser</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Required to View Quiz Results</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Webcam Required</td>
+            <td>{quiz.webcamRequired ? "Yes" : "No"}</td>
+          </tr>
+          <tr>
+            <td className="text-end fw-bold">Lock Questions After Answering</td>
+            <td>{quiz.lockQuestionsAfterAnswering ? "Yes" : "No"}</td>
+          </tr>
+        </tbody>
+      </Table>
 
-    <Row className="mb-3">
-      <Col md={4}>
-        <Form.Group>
-          <Form.Check type="checkbox" label="Webcam Required" name="webcamRequired" checked={quiz.webcamRequired} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Check type="checkbox" label="Lock Questions After Answering" name="lockQuestionsAfterAnswering" checked={quiz.lockQuestionsAfterAnswering} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-      <Col md={4}>
-        <Form.Group>
-          <Form.Label>Available Date</Form.Label>
-          <Form.Control type="datetime-local" name="availableDate" value={quiz.availableDate ? new Date(quiz.availableDate).toISOString().slice(0, 16) : ""} onChange={handleChange} />
-          <Form.Label>Due Date</Form.Label>
-          <Form.Control type="datetime-local" name="dueDate" value={quiz.dueDate ? new Date(quiz.dueDate).toISOString().slice(0, 16) : ""} onChange={handleChange} />
-          <Form.Label>Until Date</Form.Label>
-          <Form.Control type="datetime-local" name="availableUntil" value={quiz.availableUntil ? new Date(quiz.availableUntil).toISOString().slice(0, 16) : ""} onChange={handleChange} />
-        </Form.Group>
-      </Col>
-    </Row>
-
-    <Button variant="primary" onClick={handleSave}>
-      Save Quiz
-    </Button>
-  </Form>
-  </div>
-
+      {/* Date Table */}
+      <Table bordered>
+        <thead>
+          <tr>
+            <th>Due</th>
+            <th>For</th>
+            <th>Available from</th>
+            <th>Until</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{formatDate(quiz.dueDate)}</td>
+            <td>Everyone</td>
+            <td>{formatDate(quiz.availableDate)}</td>
+            <td>{formatDate(quiz.availableUntil)}</td>
+          </tr>
+        </tbody>
+      </Table>
+    </div>
   );
 }
