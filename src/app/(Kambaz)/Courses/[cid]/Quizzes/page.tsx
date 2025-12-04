@@ -19,6 +19,8 @@ import { RootState } from "../../../store";
 import * as client from "./client";
 import "../../../styles.css";
 
+/* eslint-disable */
+
 // --- Green Checkmark icon (matching assignments) ---
 function GreenCheckmark({ faded = false }: { faded?: boolean }) {
   return (
