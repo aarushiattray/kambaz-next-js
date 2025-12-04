@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Button, Card, Form } from "react-bootstrap";
 import * as client from "../../../client";
 import MCQEditor from "./mcq";
-// import TFEditor from "./tf";
-// import FIBEditor from "./fib";
+import TFEditor from "./tf";
+import FIBEditor from "./fib";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -132,7 +132,7 @@ export default function QuestionEditorPage() {
         };
       }
 
-      // Multiple Choice default answer 
+      // Multiple Choice default answer
       return {
         ...base,
         choices:
@@ -150,10 +150,14 @@ export default function QuestionEditorPage() {
 
   const type = (question.type || "MCQ").toUpperCase();
 
-  // LATER UPDATE THIS 
-  const editorBody = (
-    <MCQEditor question={question} setQuestion={setQuestion} />
-  );
+  let editorBody;
+  if (type === "TF") {
+    editorBody = <TFEditor question={question} setQuestion={setQuestion} />;
+  } else if (type === "FIB") {
+    editorBody = <FIBEditor question={question} setQuestion={setQuestion} />;
+  } else {
+    editorBody = <MCQEditor question={question} setQuestion={setQuestion} />;
+  }
 
   return (
     <div className="p-3">

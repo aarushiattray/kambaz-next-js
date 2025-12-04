@@ -1,12 +1,21 @@
 import { Button, Form } from "react-bootstrap";
 
+//students select one multiple choice 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+
+//MUST BE ABLE TO CHANGE TITLE (TEXT INPUT)
+//POINTS (NUMBER INPUT)
+//QUESTION: 
+//CHOICES (TEXT AREA): FACULTY CAN ADD OR REMOVE ANY # OF CHOICES 
+//CANCEL BUTTON THAT DISCARDS CHANGES 
 
 interface Props {
   question: any;
   setQuestion: (q: any) => void;
 }
 
+//react component that recieves the mcq auestion 
 export default function MCQEditor({ question, setQuestion }: Props) {
   const handleFieldChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

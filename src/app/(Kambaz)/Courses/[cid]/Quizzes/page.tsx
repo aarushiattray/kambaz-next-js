@@ -50,7 +50,10 @@ function QuizControlButtons() {
 function formatDate(dateStr: string) {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
   const formattedDate = date.toLocaleDateString("en-US", options);
   let hours = date.getHours();
   const minutes = date.getMinutes().toString().padStart(2, "0");
@@ -108,12 +111,12 @@ export default function Quizzes() {
     fetchQuizzes();
     router.push(`/Courses/${courseId}/Quizzes/${newQuiz._id}`);
   };
-  
+
   const handleEdit = (quizId: string) => {
     router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
     setDropdownOpen(null);
   };
-  
+
   const handleQuizClick = (quizId: string) => {
     router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
   };
@@ -221,9 +224,7 @@ export default function Quizzes() {
                         </span>
                         {" | "}
                         {quiz.points} pts |{" "}
-                        {quiz.numberOfQuestions ??
-                          quiz.questions?.length ??
-                          0}{" "}
+                        {quiz.numberOfQuestions ?? quiz.questions?.length ?? 0}{" "}
                         Questions
                         {score != null && (
                           <>
@@ -301,8 +302,8 @@ export default function Quizzes() {
           <Modal.Title>Delete Quiz</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete{" "}
-          <strong>{selectedQuiz?.title}</strong>?
+          Are you sure you want to delete <strong>{selectedQuiz?.title}</strong>
+          ?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
