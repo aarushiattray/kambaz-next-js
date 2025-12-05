@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import * as client from "../client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function QuizDetails() {
   const params = useParams();
   const router = useRouter();

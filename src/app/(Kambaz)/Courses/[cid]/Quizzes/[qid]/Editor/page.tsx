@@ -3,11 +3,13 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Form, Button, Row, Col, Card, ListGroup } from "react-bootstrap";
+import { Form, Button, Row, Col, Card, ListGroup, Nav } from "react-bootstrap";
 import { BsTrash, BsPlus } from "react-icons/bs";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../../store";
 import * as client from "../../client";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function QuizEditor() {
   const params = useParams();
@@ -47,7 +49,10 @@ export default function QuizEditor() {
         ...quiz,
         ...data,
         points:
-          data.questions?.reduce((sum: number, q: any) => sum + (q.points || 0), 0) || 0,
+          data.questions?.reduce(
+            (sum: number, q: any) => sum + (q.points || 0),
+            0
+          ) || 0,
       });
     }
   };
@@ -56,14 +61,22 @@ export default function QuizEditor() {
     fetchQuiz();
   }, [quizId]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     setQuiz((prev: any) => ({
       ...prev,
       [name]:
-        type === "checkbox" ? checked : type === "number" ? parseInt(value) || 0 : value,
+        type === "checkbox"
+          ? checked
+          : type === "number"
+          ? parseInt(value) || 0
+          : value,
     }));
   };
 
@@ -93,14 +106,20 @@ export default function QuizEditor() {
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
-  const handleChoiceChange = (qIndex: number, cIndex: number, value: string) => {
+  const handleChoiceChange = (
+    qIndex: number,
+    cIndex: number,
+    value: string
+  ) => {
     const updatedQuestions = [...quiz.questions];
     updatedQuestions[qIndex].choices[cIndex] = value;
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
   const handleDeleteQuestion = (index: number) => {
-    const updatedQuestions = quiz.questions.filter((_: any, i: number) => i !== index);
+    const updatedQuestions = quiz.questions.filter(
+      (_: any, i: number) => i !== index
+    );
     setQuiz({ ...quiz, questions: updatedQuestions });
   };
 
@@ -128,6 +147,22 @@ export default function QuizEditor() {
 
   return (
     <div className="p-3">
+      {/* Tabs: Details | Questions */}
+      <Nav variant="tabs" defaultActiveKey="details" className="mb-3">
+        <Nav.Item>
+          <Nav.Link eventKey="details">Details</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="questions"
+            onClick={() =>
+              router.push(`/Courses/${courseId}/Quizzes/${quizId}/questions`)
+            }
+          >
+            Questions
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Edit Quiz</h3>
         <div>
@@ -142,7 +177,9 @@ export default function QuizEditor() {
 
       {/* Quiz Title */}
       <Form.Group className="mb-4">
-        <Form.Label><strong>Quiz Title</strong></Form.Label>
+        <Form.Label>
+          <strong>Quiz Title</strong>
+        </Form.Label>
         <Form.Control
           type="text"
           value={quiz.title}
@@ -158,7 +195,11 @@ export default function QuizEditor() {
           <Col md={6}>
             <Form.Group>
               <Form.Label>Quiz Type</Form.Label>
-              <Form.Select name="type" value={quiz.type} onChange={handleChange}>
+              <Form.Select
+                name="type"
+                value={quiz.type}
+                onChange={handleChange}
+              >
                 <option>Graded Quiz</option>
                 <option>Practice Quiz</option>
                 <option>Graded Survey</option>
@@ -169,7 +210,11 @@ export default function QuizEditor() {
           <Col md={6}>
             <Form.Group>
               <Form.Label>Assignment Group</Form.Label>
-              <Form.Select name="assignmentGroup" value={quiz.assignmentGroup} onChange={handleChange}>
+              <Form.Select
+                name="assignmentGroup"
+                value={quiz.assignmentGroup}
+                onChange={handleChange}
+              >
                 <option>Quizzes</option>
                 <option>Exams</option>
                 <option>Assignments</option>
@@ -295,7 +340,11 @@ export default function QuizEditor() {
               <Form.Control
                 type="datetime-local"
                 name="availableDate"
-                value={quiz.availableDate ? new Date(quiz.availableDate).toISOString().slice(0, 16) : ""}
+                value={
+                  quiz.availableDate
+                    ? new Date(quiz.availableDate).toISOString().slice(0, 16)
+                    : ""
+                }
                 onChange={handleChange}
               />
             </Form.Group>
@@ -306,7 +355,11 @@ export default function QuizEditor() {
               <Form.Control
                 type="datetime-local"
                 name="dueDate"
-                value={quiz.dueDate ? new Date(quiz.dueDate).toISOString().slice(0, 16) : ""}
+                value={
+                  quiz.dueDate
+                    ? new Date(quiz.dueDate).toISOString().slice(0, 16)
+                    : ""
+                }
                 onChange={handleChange}
               />
             </Form.Group>
@@ -317,7 +370,11 @@ export default function QuizEditor() {
               <Form.Control
                 type="datetime-local"
                 name="availableUntil"
-                value={quiz.availableUntil ? new Date(quiz.availableUntil).toISOString().slice(0, 16) : ""}
+                value={
+                  quiz.availableUntil
+                    ? new Date(quiz.availableUntil).toISOString().slice(0, 16)
+                    : ""
+                }
                 onChange={handleChange}
               />
             </Form.Group>
@@ -328,91 +385,6 @@ export default function QuizEditor() {
       <hr className="my-4" />
 
       {/* Questions Section */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5>Questions ({quiz.questions.length})</h5>
-        <Button variant="primary" onClick={handleAddQuestion}>
-          <BsPlus className="fs-5" /> Add Question
-        </Button>
-      </div>
-
-      {quiz.questions.length === 0 && (
-        <Card className="text-center p-4 mb-3">
-          <Card.Body>
-            <p className="text-muted">No questions yet. Click "Add Question" to create one.</p>
-          </Card.Body>
-        </Card>
-      )}
-
-      <ListGroup>
-        {quiz.questions.map((question: any, qIndex: number) => (
-          <Card key={qIndex} className="mb-3">
-            <Card.Header className="d-flex justify-content-between align-items-center">
-              <strong>Question {qIndex + 1}</strong>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => handleDeleteQuestion(qIndex)}
-              >
-                <BsTrash /> Delete
-              </Button>
-            </Card.Header>
-            <Card.Body>
-              <Form.Group className="mb-3">
-                <Form.Label>Question Text</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={2}
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionChange(qIndex, "questionText", e.target.value)
-                  }
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Points</Form.Label>
-                <Form.Control
-                  type="number"
-                  value={question.points}
-                  onChange={(e) =>
-                    handleQuestionChange(qIndex, "points", parseInt(e.target.value) || 0)
-                  }
-                  style={{ width: "100px" }}
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Answer Choices</Form.Label>
-                {question.choices.map((choice: string, cIndex: number) => (
-                  <div key={cIndex} className="d-flex align-items-center mb-2">
-                    <Form.Check
-                      type="radio"
-                      name={`correct-${qIndex}`}
-                      checked={question.correctAnswer === choice}
-                      onChange={() =>
-                        handleQuestionChange(qIndex, "correctAnswer", choice)
-                      }
-                      className="me-2"
-                    />
-                    <Form.Control
-                      type="text"
-                      value={choice}
-                      onChange={(e) =>
-                        handleChoiceChange(qIndex, cIndex, e.target.value)
-                      }
-                      placeholder={`Option ${cIndex + 1}`}
-                    />
-                  </div>
-                ))}
-              </Form.Group>
-
-              <div className="text-muted small">
-                <strong>Correct Answer:</strong> {question.correctAnswer}
-              </div>
-            </Card.Body>
-          </Card>
-        ))}
-      </ListGroup>
     </div>
   );
 }
