@@ -77,9 +77,9 @@ export default function AssignmentEditor() {
 
       let savedAssignment;
       if (existingAssignment) {
-        savedAssignment = await client.updateAssignment(existingAssignment._id, form);
+        savedAssignment = await client.updateAssignment({ ...existingAssignment, ...form });
       } else {
-        savedAssignment = await client.createAssignment(courseId, form);
+        savedAssignment = await client.createAssignmentForCourse(courseId, { ...form, course: courseId });
       }
 
       if (!savedAssignment) throw new Error("No data returned from server");
