@@ -87,12 +87,12 @@ export default function Assignments() {
 
   const onRemoveAssignment = async (assignmentId: string) => {
     await client.deleteAssignment(assignmentId);
-    dispatch(setAssignments(assignments.filter((a: any) => a._id !== assignmentId)));
+    fetchAssignments(); // refetch from DB
   };
 
   useEffect(() => {
-    fetchAssignments();
-  }, []);
+    if (courseId) fetchAssignments();
+  }, [courseId]);
 
   const handleDelete = (assignment: any) => {
     setSelectedAssignment(assignment);
