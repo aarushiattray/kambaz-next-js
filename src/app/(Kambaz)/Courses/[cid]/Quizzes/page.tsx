@@ -82,6 +82,14 @@ export default function Quizzes() {
   const fetchQuizzes = async () => {
     if (!courseId) return;
     const data = await client.findQuizzesForCourse(courseId);
+
+    //  SORT BY AVAILABLE DATE (earliest first) 
+    data.sort((a, b) => {
+      const dateA = new Date(a.availableDate || 0).getTime();
+      const dateB = new Date(b.availableDate || 0).getTime();
+      return dateA - dateB; // earliest available first
+    });
+
     setQuizzes(data);
 
     // Fetch student scores if student

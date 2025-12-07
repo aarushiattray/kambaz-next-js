@@ -38,15 +38,57 @@ export default function Labs() {
           </Link>
         </li>
         <li>
-          <Link href="https://github.com/aarushiattray/kambaz-next-js" id="wd-github" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://github.com/aarushiattray/kambaz-next-js"
+            id="wd-github"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             GitHub Repository
           </Link>
         </li>
         <li>
-          <Link href="https://kambaz-node-server-app-8r00.onrender.com" id="wd-rootserver" target="_blank" rel="noopener noreferrer">
+          <Link
+            href="https://kambaz-node-server-app-8r00.onrender.com"
+            id="wd-rootserver"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Link to Root Server
           </Link>
         </li>
+
+        <h2>Additional Project Links</h2>
+
+        <li>
+          <Link
+            href="https://github.com/aarushiattray/kambaz-next-js/tree/quizzes"
+            id="wd-newgithubbranch"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            New GitHub Branch (React – quizzes)
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            href="https://github.com/aarushiattray/kambaz-node-server-app/tree/quizzes"
+            id="wd-newnodeserver"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            New Node Server App (quizzes branch)
+          </Link>
+        </li>
+
+        <h2>Group Members</h2>
+
+        <li>Sandra Castro-Valadez (Undergrad) — castro-valadez.s@northeastern.edu</li>
+        <li>Bhavya Kilambi (Undergrad) — kilambi.b@northeastern.edu</li>
+        <li>Aarushi Attray (Undergrad) — attray.a@northeastern.edu</li>
+        <li>Dylan Anctil (Undergrad) — anctil.d@northeastern.edu</li>
+        <li>Emily Chooi (Undergrad) — emilychooi.k@northeastern.edu</li>
       </ul>
     </div>
   );
