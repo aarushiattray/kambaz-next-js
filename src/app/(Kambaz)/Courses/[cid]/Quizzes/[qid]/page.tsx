@@ -1,4 +1,4 @@
-// Quiz Details - Emily 
+// Quiz Details - Emily
 "use client";
 
 import { useState, useEffect } from "react";
@@ -51,28 +51,34 @@ export default function QuizDetails() {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "N/A";
     const date = new Date(dateStr);
-    const options: Intl.DateTimeFormatOptions = { 
-      month: "short", 
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
-      hour12: true
+      hour12: true,
     };
     return date.toLocaleDateString("en-US", options);
   };
 
   // Calculate total points
-  const totalPoints = quiz.questions?.reduce(
-    (sum: number, q: any) => sum + (q.points || 0), 
-    0
-  ) || 0;
+  const totalPoints =
+    quiz.questions?.reduce((sum: number, q: any) => sum + (q.points || 0), 0) ||
+    0;
 
   // STUDENT VIEW
   if (currentUser.role === "STUDENT") {
     const now = new Date();
-    const availableDate = quiz.availableDate ? new Date(quiz.availableDate) : null;
-    const availableUntil = quiz.availableUntil ? new Date(quiz.availableUntil) : null;
-    const isAvailable = quiz.published && (!availableDate || now >= availableDate) && (!availableUntil || now <= availableUntil);
+    const availableDate = quiz.availableDate
+      ? new Date(quiz.availableDate)
+      : null;
+    const availableUntil = quiz.availableUntil
+      ? new Date(quiz.availableUntil)
+      : null;
+    const isAvailable =
+      quiz.published &&
+      (!availableDate || now >= availableDate) &&
+      (!availableUntil || now <= availableUntil);
 
     return (
       <div className="p-4">
@@ -82,7 +88,9 @@ export default function QuizDetails() {
         <Table bordered className="mb-4">
           <tbody>
             <tr>
-              <td className="text-end fw-bold" style={{ width: "200px" }}>Due</td>
+              <td className="text-end fw-bold" style={{ width: "200px" }}>
+                Due
+              </td>
               <td>{formatDate(quiz.dueDate)}</td>
             </tr>
             <tr>
@@ -103,15 +111,22 @@ export default function QuizDetails() {
             </tr>
             <tr>
               <td className="text-end fw-bold">Time Limit</td>
-              <td>{typeof quiz.timeLimit === 'number' ? quiz.timeLimit : 20} Minutes</td>
+              <td>
+                {typeof quiz.timeLimit === "number" ? quiz.timeLimit : 20}{" "}
+                Minutes
+              </td>
+            </tr>
+            <tr>
+              <td className="text-end fw-bold">Allowed Attempts</td>
+              <td>{quiz.multipleAttempts ? quiz.howManyAttempts || 1 : 1}</td>
             </tr>
           </tbody>
         </Table>
 
         {/* Start Quiz Button */}
         <div className="text-center">
-          <Button 
-            variant="danger" 
+          <Button
+            variant="danger"
             size="lg"
             onClick={handleStartQuiz}
             disabled={!isAvailable}
@@ -143,7 +158,9 @@ export default function QuizDetails() {
       <Table bordered className="mb-4">
         <tbody>
           <tr>
-            <td className="text-end fw-bold" style={{ width: "200px" }}>Quiz Type</td>
+            <td className="text-end fw-bold" style={{ width: "200px" }}>
+              Quiz Type
+            </td>
             <td>{quiz.type || "Graded Quiz"}</td>
           </tr>
           <tr>
@@ -160,7 +177,9 @@ export default function QuizDetails() {
           </tr>
           <tr>
             <td className="text-end fw-bold">Time Limit</td>
-            <td>{typeof quiz.timeLimit === 'number' ? quiz.timeLimit : 20} Minutes</td>
+            <td>
+              {typeof quiz.timeLimit === "number" ? quiz.timeLimit : 20} Minutes
+            </td>
           </tr>
           <tr>
             <td className="text-end fw-bold">Multiple Attempts</td>
@@ -179,7 +198,9 @@ export default function QuizDetails() {
             <td>{quiz.oneQuestionAtATime ? "Yes" : "No"}</td>
           </tr>
           <tr>
-            <td className="text-end fw-bold">Require Respondus LockDown Browser</td>
+            <td className="text-end fw-bold">
+              Require Respondus LockDown Browser
+            </td>
             <td>No</td>
           </tr>
           <tr>

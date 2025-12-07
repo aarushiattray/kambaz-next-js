@@ -71,6 +71,9 @@ export default function Quizzes() {
   const [showModal, setShowModal] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [studentScores, setStudentScores] = useState<{
+    [quizId: string]: number;
+  }>({});
 
   const currentUser = useSelector(
     (state: RootState) => state.accountReducer.currentUser
@@ -80,11 +83,30 @@ export default function Quizzes() {
     if (!courseId) return;
     const data = await client.findQuizzesForCourse(courseId);
     setQuizzes(data);
+
+    // Fetch student scores if student
+    if (currentUser?.role === "STUDENT") {
+      const scores: { [quizId: string]: number } = {};
+      for (const quiz of data) {
+        try {
+          const latestAttempt = await client.findLatestAttempt(
+            quiz._id,
+            currentUser._id
+          );
+          if (latestAttempt && latestAttempt.isSubmitted) {
+            scores[quiz._id] = latestAttempt.score;
+          }
+        } catch (error) {
+          // No attempt yet
+        }
+      }
+      setStudentScores(scores);
+    }
   };
 
   useEffect(() => {
     fetchQuizzes();
-  }, [courseId]);
+  }, [courseId, currentUser]);
 
   const handleDelete = (quiz: any) => {
     setSelectedQuiz(quiz);
@@ -186,7 +208,7 @@ export default function Quizzes() {
 
               const score =
                 currentUser?.role === "STUDENT"
-                  ? quiz.studentScores?.[currentUser._id]
+                  ? studentScores[quiz._id]
                   : null;
 
               return (
