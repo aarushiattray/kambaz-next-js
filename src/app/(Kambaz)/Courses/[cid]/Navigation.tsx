@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type CourseNavigationProps = {
-  courseId: string; 
+  courseId: string; // pass the dynamic course ID from layout
 };
 
 export default function CourseNavigation({ courseId }: CourseNavigationProps) {
@@ -16,7 +16,7 @@ export default function CourseNavigation({ courseId }: CourseNavigationProps) {
     <div id="wd-courses-navigation" className="wd list-group fs-5 rounded-0">
       {links.map((link) => {
       
-        const path = link === "People" ? `/Courses/${courseId}/People/` : `/Courses/${courseId}/${link}`;
+        const path = link === "People" ? `/Courses/${courseId}/People/Table` : `/Courses/${courseId}/${link}`;
 
         
         const isActive = pathname === path || pathname.includes(path);
