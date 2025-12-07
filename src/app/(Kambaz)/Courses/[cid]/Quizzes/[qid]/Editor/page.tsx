@@ -388,16 +388,34 @@ export default function QuizEditor() {
         </Col>
       </Row>
 
-      <Row className="mb-2">
+       <Row className="mb-2 align-items-center">
         <Col xs={4}></Col>
         <Col xs={8}>
-          <Form.Check
-            type="checkbox"
-            label="Allow Multiple Attempts"
-            name="multipleAttempts"
-            checked={quiz.multipleAttempts}
-            onChange={handleChange}
-          />
+          <div className="d-flex align-items-center gap-2">
+            <Form.Check
+              type="checkbox"
+              label="Allow Multiple Attempts"
+              checked={quiz.multipleAttempts}
+              onChange={(e) =>
+                setQuiz({
+                  ...quiz,
+                  multipleAttempts: e.target.checked,
+                  howManyAttempts: e.target.checked ? 2 : 1,
+                })
+              }
+            />
+            <Form.Control
+              type="number"
+              name="howManyAttempts"
+              value={quiz.howManyAttempts}
+              onChange={handleChange}
+              disabled={!quiz.multipleAttempts}
+              style={{ width: "80px" }}
+              size="sm"
+              min="1"
+            />
+            <span className="text-muted">Attempts</span>
+          </div>
         </Col>
       </Row>
 

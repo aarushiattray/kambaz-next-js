@@ -42,7 +42,7 @@ export default function QuizDetails() {
   };
 
   const handleStartQuiz = () => {
-    router.push(`/Courses/${courseId}/Quizzes/${quizId}/start`);
+    router.push(`/Courses/${courseId}/Quizzes/${quizId}/questions/page.tsx`);
   };
 
   if (!currentUser || !quiz) return <div className="p-3">Loading...</div>;
