@@ -40,3 +40,41 @@ export const findQuizById = async (quizId: string) => {
     const res = await axiosWithCredentials.get(`${QUIZZES_API}/quizzes/${quizId}`);
     return res.data;
   };
+
+// Quiz Attempts API
+export const findAttemptsByQuizAndUser = async (quizId: string, userId: string) => {
+  const res = await axiosWithCredentials.get(
+    `${QUIZZES_API}/quizzes/${quizId}/users/${userId}/attempts`
+  );
+  return res.data;
+};
+
+export const findLatestAttempt = async (quizId: string, userId: string) => {
+  const res = await axiosWithCredentials.get(
+    `${QUIZZES_API}/quizzes/${quizId}/users/${userId}/latest`
+  );
+  return res.data;
+};
+
+export const createAttempt = async (attempt: any) => {
+  const res = await axiosWithCredentials.post(
+    `${QUIZZES_API}/quiz-attempts`,
+    attempt
+  );
+  return res.data;
+};
+
+export const updateAttempt = async (attemptId: string, updates: any) => {
+  const res = await axiosWithCredentials.put(
+    `${QUIZZES_API}/quiz-attempts/${attemptId}`,
+    updates
+  );
+  return res.data;
+};
+
+export const getAttemptCount = async (quizId: string, userId: string) => {
+  const res = await axiosWithCredentials.get(
+    `${QUIZZES_API}/quizzes/${quizId}/users/${userId}/count`
+  );
+  return res.data;
+};
