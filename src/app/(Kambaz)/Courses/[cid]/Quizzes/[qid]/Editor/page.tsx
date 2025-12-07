@@ -85,34 +85,48 @@ export default function QuizEditor() {
   };
 
   const handleSave = async () => {
-    const totalPoints = quiz.questions.reduce(
-      (sum: number, q: any) => sum + (q.points || 0),
-      0
-    );
-    const updatedQuiz = {
-      ...quiz,
-      points: totalPoints,
-      numberOfQuestions: quiz.questions.length,
-      timeLimit: quiz.hasTimeLimit ? quiz.timeLimit : 0,
-    };
-    await client.updateQuiz(quizId, updatedQuiz);
-    router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
+    try {
+      const totalPoints = quiz.questions.reduce(
+        (sum: number, q: any) => sum + (q.points || 0),
+        0
+      );
+      const updatedQuiz = {
+        ...quiz,
+        points: totalPoints,
+        numberOfQuestions: quiz.questions.length,
+        timeLimit: quiz.hasTimeLimit ? quiz.timeLimit : 0,
+      };
+      console.log("Saving quiz:", updatedQuiz);
+      const result = await client.updateQuiz(quizId, updatedQuiz);
+      console.log("Save result:", result);
+      router.push(`/Courses/${courseId}/Quizzes/${quizId}`);
+    } catch (error) {
+      console.error("Error saving quiz:", error);
+      alert("Failed to save quiz. Check console for details.");
+    }
   };
 
   const handleSaveAndPublish = async () => {
-    const totalPoints = quiz.questions.reduce(
-      (sum: number, q: any) => sum + (q.points || 0),
-      0
-    );
-    const updatedQuiz = {
-      ...quiz,
-      points: totalPoints,
-      numberOfQuestions: quiz.questions.length,
-      timeLimit: quiz.hasTimeLimit ? quiz.timeLimit : 0,
-      published: true,
-    };
-    await client.updateQuiz(quizId, updatedQuiz);
-    router.push(`/Courses/${courseId}/Quizzes`);
+    try {
+      const totalPoints = quiz.questions.reduce(
+        (sum: number, q: any) => sum + (q.points || 0),
+        0
+      );
+      const updatedQuiz = {
+        ...quiz,
+        points: totalPoints,
+        numberOfQuestions: quiz.questions.length,
+        timeLimit: quiz.hasTimeLimit ? quiz.timeLimit : 0,
+        published: true,
+      };
+      console.log("Saving and publishing quiz:", updatedQuiz);
+      const result = await client.updateQuiz(quizId, updatedQuiz);
+      console.log("Save and publish result:", result);
+      router.push(`/Courses/${courseId}/Quizzes`);
+    } catch (error) {
+      console.error("Error saving and publishing quiz:", error);
+      alert("Failed to save and publish quiz. Check console for details.");
+    }
   };
 
   const handleCancel = () => {
@@ -120,13 +134,20 @@ export default function QuizEditor() {
   };
 
   const handleUnpublish = async () => {
-    const updatedQuiz = {
-      ...quiz,
-      published: false,
-    };
-    await client.updateQuiz(quizId, updatedQuiz);
-    setQuiz(updatedQuiz);
-    setShowUnpublishMenu(false);
+    try {
+      const updatedQuiz = {
+        ...quiz,
+        published: false,
+      };
+      console.log("Unpublishing quiz:", updatedQuiz);
+      const result = await client.updateQuiz(quizId, updatedQuiz);
+      console.log("Unpublish result:", result);
+      setQuiz(updatedQuiz);
+      setShowUnpublishMenu(false);
+    } catch (error) {
+      console.error("Error unpublishing quiz:", error);
+      alert("Failed to unpublish quiz. Check console for details.");
+    }
   };
 
   if (!currentUser || currentUser.role !== "FACULTY") {
@@ -235,30 +256,7 @@ export default function QuizEditor() {
       <Form.Group className="mb-4">
         <Form.Label>Quiz Instructions:</Form.Label>
         <div className="border rounded">
-          {/* WYSIWYG Toolbar
-          <div className="bg-light border-bottom p-2 d-flex gap-2 align-items-center flex-wrap">
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>Edit</option>
-            </Form.Select>
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>View</option>
-            </Form.Select>
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>Insert</option>
-            </Form.Select>
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>Format</option>
-            </Form.Select>
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>Tools</option>
-            </Form.Select>
-            <Form.Select size="sm" style={{ width: "auto" }}>
-              <option>Table</option>
-            </Form.Select>
-            <div className="ms-auto">
-              <span className="text-success">● 100%</span>
-            </div> */}
-          {/* </div> */}
+    
 
           {/* Format Toolbar */}
           <div className="bg-light border-bottom p-2 d-flex gap-2 align-items-center flex-wrap">
@@ -301,6 +299,14 @@ export default function QuizEditor() {
               <Button variant="link" size="sm" className="p-0 text-muted">
                 &lt;/&gt;
               </Button>
+              <div
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  border: "2px solid #dc3545",
+                  borderRadius: "4px",
+                }}
+              ></div>
             </div>
           </div>
         </div>
@@ -388,7 +394,7 @@ export default function QuizEditor() {
         </Col>
       </Row>
 
-       <Row className="mb-2 align-items-center">
+      <Row className="mb-2 align-items-center">
         <Col xs={4}></Col>
         <Col xs={8}>
           <div className="d-flex align-items-center gap-2">
@@ -509,71 +515,47 @@ export default function QuizEditor() {
 
         <Form.Group className="mb-3">
           <Form.Label className="fw-bold">Due</Form.Label>
-          <div className="position-relative">
-            <Form.Control
-              type="datetime-local"
-              name="dueDate"
-              value={
-                quiz.dueDate
-                  ? new Date(quiz.dueDate).toISOString().slice(0, 16)
-                  : ""
-              }
-              onChange={handleChange}
-            />
-            <span
-              className="position-absolute"
-              style={{ right: "10px", top: "50%", transform: "translateY(-50%)" }}
-            >
-              📅
-            </span>
-          </div>
+          <Form.Control
+            type="datetime-local"
+            name="dueDate"
+            value={
+              quiz.dueDate
+                ? new Date(quiz.dueDate).toISOString().slice(0, 16)
+                : ""
+            }
+            onChange={handleChange}
+          />
         </Form.Group>
 
         <Row>
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Available from</Form.Label>
-              <div className="position-relative">
-                <Form.Control
-                  type="datetime-local"
-                  name="availableDate"
-                  value={
-                    quiz.availableDate
-                      ? new Date(quiz.availableDate).toISOString().slice(0, 16)
-                      : ""
-                  }
-                  onChange={handleChange}
-                />
-                <span
-                  className="position-absolute"
-                  style={{ right: "10px", top: "50%", transform: "translateY(-50%)" }}
-                >
-                  📅
-                </span>
-              </div>
+              <Form.Control
+                type="datetime-local"
+                name="availableDate"
+                value={
+                  quiz.availableDate
+                    ? new Date(quiz.availableDate).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Until</Form.Label>
-              <div className="position-relative">
-                <Form.Control
-                  type="datetime-local"
-                  name="availableUntil"
-                  value={
-                    quiz.availableUntil
-                      ? new Date(quiz.availableUntil).toISOString().slice(0, 16)
-                      : ""
-                  }
-                  onChange={handleChange}
-                />
-                <span
-                  className="position-absolute"
-                  style={{ right: "10px", top: "50%", transform: "translateY(-50%)" }}
-                >
-                  📅
-                </span>
-              </div>
+              <Form.Control
+                type="datetime-local"
+                name="availableUntil"
+                value={
+                  quiz.availableUntil
+                    ? new Date(quiz.availableUntil).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={handleChange}
+              />
             </Form.Group>
           </Col>
         </Row>
