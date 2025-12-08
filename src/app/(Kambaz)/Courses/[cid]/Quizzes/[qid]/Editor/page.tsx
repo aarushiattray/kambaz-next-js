@@ -256,7 +256,7 @@ export default function QuizEditor() {
       <Form.Group className="mb-4">
         <Form.Label>Quiz Instructions:</Form.Label>
         <div className="border rounded">
-    
+   
 
           {/* Format Toolbar */}
           <div className="bg-light border-bottom p-2 d-flex gap-2 align-items-center flex-wrap">
