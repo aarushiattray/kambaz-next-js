@@ -69,7 +69,7 @@ export default function Labs() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            New GitHub Branch for Final Project(React – Quizzes)
+            New GitHub Branch for Final Project (React – Quizzes)
           </Link>
         </li>
 
@@ -95,7 +95,7 @@ export default function Labs() {
           </Link>
         </li>
 
-        <h3>Group Members</h3>
+        <h3>Group Members (all CS4550)</h3>
 
         <li>Sandra Castro-Valadez (Undergrad) — castro-valadez.s@northeastern.edu</li>
         <li>Bhavya Kilambi (Undergrad) — kilambi.b@northeastern.edu</li>
