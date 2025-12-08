@@ -1,4 +1,4 @@
-//  True/False Question Editor - Bhavya/Sandra
+//  True/False Question Editor 
 
 //we need handle addQuestions
 

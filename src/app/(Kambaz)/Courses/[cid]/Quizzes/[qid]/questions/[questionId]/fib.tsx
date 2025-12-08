@@ -1,4 +1,4 @@
-// Fill-in-the-Blank Question Editor - Bhavya/Sandra
+// Fill-in-the-Blank Question Editor 
 import { Form, Button } from "react-bootstrap";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

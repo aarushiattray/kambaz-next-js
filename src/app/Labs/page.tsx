@@ -58,6 +58,8 @@ export default function Labs() {
           </Link>
         </li>
 
+        <hr />
+
         <h2>Additional Project Links</h2>
 
         <li>
@@ -67,7 +69,7 @@ export default function Labs() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            New GitHub Branch (React – quizzes)
+            New GitHub Branch for Final Project(React – Quizzes)
           </Link>
         </li>
 
@@ -78,11 +80,22 @@ export default function Labs() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            New Node Server App (quizzes branch)
+            New Node Server App for Final Project (Quizzes branch)
           </Link>
         </li>
 
-        <h2>Group Members</h2>
+        <li>
+          <Link
+            href="https://kambaz-node-server-app-3-8lu7.onrender.com"
+            id="wd-newrootserver"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Root Server for Final Project
+          </Link>
+        </li>
+
+        <h3>Group Members</h3>
 
         <li>Sandra Castro-Valadez (Undergrad) — castro-valadez.s@northeastern.edu</li>
         <li>Bhavya Kilambi (Undergrad) — kilambi.b@northeastern.edu</li>

@@ -1,4 +1,4 @@
-// Quiz List Page - Aarushi
+// Quiz List Page 
 "use client";
 
 import { useState, useEffect } from "react";

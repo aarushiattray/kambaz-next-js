@@ -1,4 +1,4 @@
-// Quiz Details - Emily
+// Quiz Details 
 "use client";
 
 import { useState, useEffect } from "react";

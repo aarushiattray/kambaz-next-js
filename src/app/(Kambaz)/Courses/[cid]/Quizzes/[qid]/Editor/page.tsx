@@ -1,4 +1,4 @@
-// Quiz Editor - Emily
+// Quiz Editor 
 "use client";
 
 import { useState, useEffect } from "react";
